@@ -1,0 +1,139 @@
+@import "tailwindcss";
+
+@theme{
+    --color-primary: #0d9488;        /* Teal/Verde azulado profesional */
+    --color-primary-hover: #0f766e;  /* Teal más oscuro */
+    
+    /* Colores de Fondo */
+    --color-background: #f8fafc;     /* Griz muy claro, suave para la vista */
+    --color-surface: #ffffff;        /* Blanco para tarjetas y contenedores */
+    --color-surface-secondary: #f1f5f9; /* Gris claro para secciones alternas */
+    
+    /* Colores de Texto */
+    --color-foreground: #1e293b;     /* Gris oscuro para texto principal */
+    --color-foreground-muted: #64748b; /* Gris medio para texto secundario */
+    
+    /* Colores Funcionales */
+    --color-success: #059669;        /* Esmeralda para ingresos */
+    --color-success-hover: #047857;  /* Hover más oscuro para success */
+    --color-success-light: #d1fae5;  
+    --color-warning: #d97706;        /* Ámbar para alertas */
+    --color-warning-hover: #b45309;  /* Hover más oscuro para warning */
+    --color-warning-light: #fef3c7;  
+    --color-danger: #e11d48;         /* Rosa-rojo para gastos */
+    --color-danger-hover: #be123c;   /* Hover más oscuro para danger */
+    --color-danger-light: #ffe4e6;
+    
+    /* Bordes y Divisores */
+    --color-border: #e2e8f0;         /* Gris claro para bordes */
+    --color-border-strong: #cbd5e1;
+}
+
+
+:root.dark{ /* Colores Principales */
+    --color-primary: #14b8a6;        /* Teal brillante */
+    --color-primary-hover: #2dd4bf;
+    
+    /* Colores de Fondo */
+    --color-background: #0f172a;     /* Azul oscuro suave (mejor que negro puro) */
+    --color-surface: #1e293b;        /* Gris azulado para tarjetas */
+    --color-surface-secondary: #334155; /* Gris medio para secciones alternas */
+    
+    /* Colores de Texto */
+    --color-foreground: #f1f5f9;     /* Gris muy claro para texto principal */
+    --color-foreground-muted: #94a3b8; /* Gris claro para texto secundario */
+    
+    /* Colores Funcionales */
+    --color-success: #10b981;        /* Esmeralda brillante */
+    --color-success-hover: #059669;  /* Hover más oscuro para success */
+    --color-success-light: #064e3b;  
+    --color-warning: #f59e0b;        /* Ámbar brillante */
+    --color-warning-hover: #d97706;  /* Hover más oscuro para warning */
+    --color-warning-light: #78350f;  
+    --color-danger: #f43f5e;         /* Rosa-rojo brillante */
+    --color-danger-hover: #e11d48;   /* Hover más oscuro para danger */
+    --color-danger-light: #881337;
+    
+    /* Bordes y Divisores */
+    --color-border: #334155;         /* Gris medio para bordes */
+    --color-border-strong: #475569;
+}
+
+@layer components {
+    .container {
+        @apply mx-auto px-4 sm:px-6 lg:px-8;
+        max-width: 1200px;
+    }
+
+    .container-sm {
+        @apply mx-auto px-4 sm:px-6;
+        max-width: 640px;
+    }
+
+    .container-md {
+        @apply mx-auto px-4 sm:px-6 lg:px-8;
+        max-width: 768px;
+    }
+
+    .container-lg {
+        @apply mx-auto px-4 sm:px-6 lg:px-8;
+        max-width: 1024px;
+    }
+
+    .container-xl {
+        @apply mx-auto px-4 sm:px-6 lg:px-8;
+        max-width: 1280px;
+    }
+
+    .container-fluid {
+        @apply w-full px-4 sm:px-6 lg:px-8;
+    }
+    
+    .input {
+        @apply w-full px-3 py-2 border border-border rounded-md 
+        bg-surface text-foreground focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary;
+    }
+
+    .form-group {
+        @apply mb-4;
+    }
+
+    .form-label {
+        @apply block text-sm font-medium text-foreground mb-2;
+    }
+
+    .form-control {
+        @apply w-full px-3 py-2 border border-border rounded-md 
+        bg-surface text-foreground placeholder:text-foreground-muted
+        focus:bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary
+        disabled:bg-surface-secondary disabled:text-foreground-muted disabled:cursor-not-allowed;
+    }
+
+    .form-text {
+        @apply text-sm text-foreground-muted mt-1;
+    }
+
+    .form-control.is-invalid {
+        @apply border-danger focus:ring-danger focus:border-danger;
+    }
+
+    .form-control.is-valid {
+        @apply border-success focus:ring-success focus:border-success;
+    }
+
+    .invalid-feedback {
+        @apply text-sm text-danger mt-1 block;
+    }
+
+    .valid-feedback {
+        @apply text-sm text-success mt-1 block;
+    }
+}
+
+* {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+  
+html {
+  transition: background-color 0.3s ease;
+}
