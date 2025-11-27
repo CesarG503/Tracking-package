@@ -1,46 +1,111 @@
-@extends('layout')
+@extends('layouts.app')
 
 @section('title', 'Iniciar Sesión')
 
 @section('content')
-<div class="flex min-h-[80vh] items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="w-full max-w-md space-y-8 bg-surface p-8 rounded-lg shadow-lg border border-border">
-        <div>
-            <h2 class="mt-6 text-center text-3xl font-bold tracking-tight text-foreground">
-                Iniciar Sesión
-            </h2>
-            <p class="mt-2 text-center text-sm text-foreground-muted">
-                ¿No tienes una cuenta?
-                <a href="{{ route('register') }}" class="font-medium text-primary hover:text-primary/90">
-                    Regístrate aquí
-                </a>
-            </p>
+<div class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+        <!-- Logo 
+        <div class="flex justify-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                </svg>
+            </div>
         </div>
-        <form class="mt-8 space-y-6" action="{{ route('login') }}" method="POST">
-            @csrf
-            <div class="-space-y-px rounded-md shadow-sm">
-                <div class="mb-4">
-                    <label for="email" class="block text-sm font-medium text-foreground mb-1">Correo Electrónico</label>
-                    <input id="email" name="email" type="email" autocomplete="email" required class="relative block w-full rounded-md border-0 py-1.5 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3" placeholder="correo@ejemplo.com">
-                    @error('email')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
-                <div>
-                    <label for="password" class="block text-sm font-medium text-foreground mb-1">Contraseña</label>
-                    <input id="password" name="password" type="password" autocomplete="current-password" required class="relative block w-full rounded-md border-0 py-1.5 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6 px-3" placeholder="••••••••">
-                    @error('password')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
-                </div>
+        -->
+
+        <!-- Glass Card -->
+        <div class="glass-card rounded-3xl p-8">
+            <div class="text-center mb-8">
+                <h1 class="text-2xl font-bold text-gray-800">Bienvenido</h1>
+                <p class="text-gray-500 mt-2">Ingresa a tu cuenta para continuar</p>
             </div>
 
-            <div>
-                <button type="submit" class="group relative flex w-full justify-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
-                    Ingresar
+            @if(session('status'))
+                <div class="mb-4 p-4 rounded-xl bg-green-50 border border-green-200 text-green-700 text-sm">
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                @csrf
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">
+                        Correo Electrónico
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"/>
+                            </svg>
+                        </div>
+                        <input 
+                            id="email" 
+                            name="email" 
+                            type="email" 
+                            value="{{ old('email') }}"
+                            required 
+                            autofocus
+                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 outline-none @error('email') border-red-400 @enderror"
+                            placeholder="correo@ejemplo.com"
+                        >
+                    </div>
+                    @error('email')
+                        <p class="mt-2 text-sm text-red-500 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                        Contraseña
+                    </label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                        </div>
+                        <input 
+                            id="password" 
+                            name="password" 
+                            type="password" 
+                            required
+                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 outline-none @error('password') border-red-400 @enderror"
+                            placeholder="••••••••"
+                        >
+                    </div>
+                    @error('password')
+                        <p class="mt-2 text-sm text-red-500 flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            {{ $message }}
+                        </p>
+                    @enderror
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="remember" class="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500/20">
+                        <span class="text-sm text-gray-600">Recordarme</span>
+                    </label>
+                </div>
+
+                <button 
+                    type="submit" 
+                    class="w-full py-3 px-4 bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-blue-600/40 transition-all duration-200 transform hover:-translate-y-0.5"
+                >
+                    Iniciar Sesión
                 </button>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
 </div>
 @endsection
