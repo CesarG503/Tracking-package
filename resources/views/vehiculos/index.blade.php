@@ -90,7 +90,8 @@
                                 @endphp
                                 <tr class="cursor-pointer vehiculo-row hover:bg-surface-secondary/50 transition-colors" 
                                     data-id="{{ $vehiculo->id }}" 
-                                    onclick="selectVehiculo({{ $vehiculo->id }}, '{{ $vehiculo->marca }}', '{{ $vehiculo->modelo }}', '{{ $vehiculo->placa }}', '{{ $vehiculo->anio }}', '{{ $vehiculo->estado }}', '{{ addslashes($vehiculo->observaciones) }}', {{ json_encode(json_decode($vehiculo->foto, true) ?? []) }})">
+                                    onclick="selectVehiculo({{ $vehiculo->id }}, '{{ $vehiculo->marca }}', '{{ $vehiculo->modelo }}', '{{ $vehiculo->placa }}', '{{ $vehiculo->anio }}', '{{ $vehiculo->estado }}', '{{ addslashes($vehiculo->observaciones) }}', {{ json_encode(json_decode($vehiculo->foto, true) ?? []) }})"
+                                    ondblclick="window.location.href='{{ route('vehiculos.show', $vehiculo) }}'">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <span class="w-3 h-3 rounded-full {{ $statusColors[$vehiculo->estado] ?? 'bg-foreground-muted' }} ring-4 ring-opacity-20 {{ str_replace('bg-', 'ring-', $statusColors[$vehiculo->estado] ?? 'ring-foreground-muted') }}"></span>
