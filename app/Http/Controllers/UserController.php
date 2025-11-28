@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -40,17 +42,9 @@ class UserController extends Controller
         return view('usuarios.create');
     }
 
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email',
-            'password' => ['required', 'confirmed', Password::min(8)],
-            'telefono' => 'nullable|string|max:20',
-            'rol' => 'required|in:admin,repartidor',
-            'licencia' => 'nullable|string|max:50',
-            'activo' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['password'] = Hash::make($validated['password']);
         $validated['activo'] = $request->has('activo');
@@ -72,17 +66,9 @@ class UserController extends Controller
         return view('usuarios.edit', compact('usuario'));
     }
 
-    public function update(Request $request, User $usuario)
+    public function update(UpdateUserRequest $request, User $usuario)
     {
-        $validated = $request->validate([
-            'nombre' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $usuario->id,
-            'password' => ['nullable', 'confirmed', Password::min(8)],
-            'telefono' => 'nullable|string|max:20',
-            'rol' => 'required|in:admin,repartidor',
-            'licencia' => 'nullable|string|max:50',
-            'activo' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         if (!empty($validated['password'])) {
             $validated['password'] = Hash::make($validated['password']);
