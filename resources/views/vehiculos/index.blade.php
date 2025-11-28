@@ -90,7 +90,7 @@
                                 @endphp
                                 <tr class="cursor-pointer vehiculo-row hover:bg-surface-secondary/50 transition-colors" 
                                     data-id="{{ $vehiculo->id }}" 
-                                    onclick="selectVehiculo({{ $vehiculo->id }}, '{{ $vehiculo->marca }}', '{{ $vehiculo->modelo }}', '{{ $vehiculo->placa }}', '{{ $vehiculo->anio }}', '{{ $vehiculo->estado }}', '{{ addslashes($vehiculo->observaciones) }}', {{ json_encode(json_decode($vehiculo->foto, true) ?? []) }})">
+                                    onclick="selectVehiculo({{ $vehiculo->id }}, '{{ $vehiculo->marca }}', '{{ $vehiculo->modelo }}', '{{ $vehiculo->placa }}', '{{ $vehiculo->anio }}', '{{ $vehiculo->estado }}', '{{ addslashes($vehiculo->observaciones) }}', {{ json_encode(json_decode($vehiculo->foto, true) ?? []) }}, '{{ route('vehiculos.edit', $vehiculo) }}', '{{ route('vehiculos.show', $vehiculo) }}')">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <span class="w-3 h-3 rounded-full {{ $statusColors[$vehiculo->estado] ?? 'bg-foreground-muted' }} ring-4 ring-opacity-20 {{ str_replace('bg-', 'ring-', $statusColors[$vehiculo->estado] ?? 'ring-foreground-muted') }}"></span>
@@ -225,7 +225,7 @@
 @push('scripts')
 <script>
 // Select vehicle and show preview
-function selectVehiculo(id, marca, modelo, placa, anio, estado, observaciones, fotos) {
+function selectVehiculo(id, marca, modelo, placa, anio, estado, observaciones, fotos, editUrl, showUrl) {
     // Update row selection
     document.querySelectorAll('.vehiculo-row').forEach(row => {
         row.classList.remove('bg-primary/5', 'border-l-4', 'border-l-primary');
@@ -267,7 +267,7 @@ function selectVehiculo(id, marca, modelo, placa, anio, estado, observaciones, f
     const imgEl = document.getElementById('preview-image');
     const noImgEl = document.getElementById('preview-no-image');
     if (fotos && fotos.length > 0) {
-        imgEl.src = '/storage/' + fotos[0];
+        imgEl.src = '{{ asset("storage") }}/' + fotos[0];
         imgEl.classList.remove('hidden');
         noImgEl.classList.add('hidden');
     } else {
@@ -276,8 +276,8 @@ function selectVehiculo(id, marca, modelo, placa, anio, estado, observaciones, f
     }
 
     // Update links
-    document.getElementById('preview-edit-btn').href = `/vehiculos/${id}/edit`;
-    document.getElementById('preview-view-btn').href = `/vehiculos/${id}`;
+    document.getElementById('preview-edit-btn').href = editUrl;
+    document.getElementById('preview-view-btn').href = showUrl;
 }
 
 // Confirm delete with SweetAlert2
