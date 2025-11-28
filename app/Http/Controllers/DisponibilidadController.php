@@ -105,12 +105,56 @@ class DisponibilidadController extends Controller
         foreach ($request->repartidor_ids as $repartidorId) {
             foreach ($request->fechas as $fecha) {
                 $fechaCarbon = Carbon::parse($fecha);
+                $inicio = $fechaCarbon->copy()->setTimeFromTimeString($request->hora_inicio);
+                $fin = $fechaCarbon->copy()->setTimeFromTimeString($request->hora_fin);
+
+                // Validar disponibilidad del repartidor
+                $repartidorOcupado = Disponibilidad::where('repartidor_id', $repartidorId)
+                    ->where(function($query) use ($inicio, $fin) {
+                        $query->whereBetween('fecha_inicio', [$inicio, $fin])
+                            ->orWhereBetween('fecha_fin', [$inicio, $fin])
+                            ->orWhere(function($q) use ($inicio, $fin) {
+                                $q->where('fecha_inicio', '<=', $inicio)
+                                  ->where('fecha_fin', '>=', $fin);
+                            });
+                    })
+                    ->exists();
+
+                if ($repartidorOcupado) {
+                    $repartidor = User::find($repartidorId);
+                    return response()->json([
+                        'success' => false,
+                        'message' => "El repartidor {$repartidor->nombre} ya tiene una asignación el {$fecha} en este horario."
+                    ], 422);
+                }
+
+                // Validar disponibilidad del vehículo (si se seleccionó uno)
+                if ($request->vehiculo_id) {
+                    $vehiculoOcupado = Disponibilidad::where('vehiculo_id', $request->vehiculo_id)
+                        ->where(function($query) use ($inicio, $fin) {
+                            $query->whereBetween('fecha_inicio', [$inicio, $fin])
+                                ->orWhereBetween('fecha_fin', [$inicio, $fin])
+                                ->orWhere(function($q) use ($inicio, $fin) {
+                                    $q->where('fecha_inicio', '<=', $inicio)
+                                      ->where('fecha_fin', '>=', $fin);
+                                });
+                        })
+                        ->exists();
+
+                    if ($vehiculoOcupado) {
+                        $vehiculo = Vehiculo::find($request->vehiculo_id);
+                        return response()->json([
+                            'success' => false,
+                            'message' => "El vehículo {$vehiculo->placa} ya está en uso el {$fecha} en este horario."
+                        ], 422);
+                    }
+                }
                 
                 $disponibilidad = Disponibilidad::create([
                     'repartidor_id' => $repartidorId,
                     'vehiculo_id' => $request->vehiculo_id,
-                    'fecha_inicio' => $fechaCarbon->copy()->setTimeFromTimeString($request->hora_inicio),
-                    'fecha_fin' => $fechaCarbon->copy()->setTimeFromTimeString($request->hora_fin),
+                    'fecha_inicio' => $inicio,
+                    'fecha_fin' => $fin,
                     'tipo' => $request->tipo,
                     'descripcion' => $request->descripcion,
                 ]);

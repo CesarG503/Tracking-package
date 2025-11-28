@@ -194,7 +194,7 @@
             </div>
 
             <!-- Action Button -->
-            <div class="p-4 border-t border-border">
+            <div class="p-4 border-t border-border space-y-2">
                 <button type="button" 
                         onclick="openCreateModal()"
                         class="w-full py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium transition-colors flex items-center justify-center gap-2">
@@ -202,6 +202,16 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                     </svg>
                     Crear Disponibilidad
+                </button>
+                
+                <button type="button" 
+                        onclick="openConfigModal()"
+                        class="w-full py-2 bg-surface-secondary hover:bg-border text-foreground rounded-xl font-medium transition-colors flex items-center justify-center gap-2 text-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    Configurar Búsqueda
                 </button>
             </div>
         </div>
@@ -481,6 +491,46 @@
                 </button>
                 <button type="submit" class="flex-1 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium transition-colors">
                     Actualizar
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal Configuración -->
+<div id="modal-config" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+    <div class="glass-card rounded-2xl w-full max-w-sm">
+        <div class="p-6 border-b border-border">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-foreground">Configurar Búsqueda</h3>
+                <button onclick="cerrarConfigModal()" class="w-8 h-8 rounded-lg hover:bg-surface-secondary flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        
+        <form id="form-config" class="p-6 space-y-4">
+            <p class="text-sm text-foreground-muted">Define el horario laboral para verificar la disponibilidad de vehículos y empleados.</p>
+            
+            <div class="grid grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="form-label" for="config-inicio">Hora Inicio</label>
+                    <input type="time" id="config-inicio" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="config-fin">Hora Fin</label>
+                    <input type="time" id="config-fin" class="form-control" required>
+                </div>
+            </div>
+
+            <div class="flex gap-3 pt-4">
+                <button type="button" onclick="cerrarConfigModal()" class="flex-1 py-3 bg-surface-secondary hover:bg-border text-foreground rounded-xl font-medium transition-colors">
+                    Cancelar
+                </button>
+                <button type="submit" class="flex-1 py-3 bg-primary hover:bg-primary-hover text-white rounded-xl font-medium transition-colors">
+                    Guardar
                 </button>
             </div>
         </form>
@@ -798,16 +848,152 @@
                 }).then(() => {
                     window.location.reload();
                 });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: data.message || 'Ocurrió un error al guardar'
+                });
             }
         })
         .catch(error => {
+            console.error('Error:', error);
             Swal.fire({
                 icon: 'error',
                 title: 'Error',
-                text: 'No se pudo crear la disponibilidad'
+                text: 'Ocurrió un error de conexión'
             });
         });
     });
+
+    // Validar conflictos visualmente al seleccionar
+    function checkConflicts() {
+        // Reset visual states
+        document.querySelectorAll('.repartidor-chip').forEach(el => {
+            if (!el.classList.contains('selected')) {
+                el.style.opacity = '1';
+                el.title = '';
+            }
+        });
+        
+        document.querySelectorAll('.vehiculo-card').forEach(el => {
+            if (!el.classList.contains('selected')) {
+                el.classList.remove('in-use');
+                const badge = el.querySelector('.rounded-full.text-xs');
+                if (badge) {
+                     // Restaurar estado original basado en data-en-uso inicial (esto es simplificado, idealmente deberíamos recalcular todo)
+                     // Para simplificar, solo marcaremos conflictos con la selección actual
+                     if (el.dataset.enUso === 'false') {
+                         badge.className = 'px-2 py-1 text-xs rounded-full bg-success-light text-success';
+                         badge.textContent = 'Libre';
+                     }
+                }
+            }
+        });
+
+        if (diasSeleccionados.length === 0) return;
+
+        // Check repartidores conflicts
+        repartidoresSeleccionados.forEach(rep => {
+            const hasConflict = eventosData.some(evento => {
+                const eventoFecha = evento.fecha_inicio.split(' ')[0];
+                return diasSeleccionados.includes(eventoFecha) && evento.repartidor_id === rep.id;
+            });
+            
+            if (hasConflict) {
+                // Visual feedback for conflict? Maybe a warning icon or text
+            }
+        });
+
+        // Check vehicle conflicts
+        if (vehiculoSeleccionado) {
+             const hasConflict = eventosData.some(evento => {
+                const eventoFecha = evento.fecha_inicio.split(' ')[0];
+                return diasSeleccionados.includes(eventoFecha) && evento.vehiculo_id === vehiculoSeleccionado.id;
+            });
+            
+            if (hasConflict) {
+                 // Visual feedback
+            }
+        }
+        
+        // Update availability status for ALL items based on selected dates
+        updateAvailabilityStatus();
+    }
+
+    function updateAvailabilityStatus() {
+        if (diasSeleccionados.length === 0) return;
+
+        // Check all repartidores
+        document.querySelectorAll('.repartidor-chip').forEach(el => {
+            const id = parseInt(el.dataset.id);
+            const isBusy = eventosData.some(evento => {
+                const eventoFecha = evento.fecha_inicio.split(' ')[0];
+                return diasSeleccionados.includes(eventoFecha) && evento.repartidor_id === id;
+            });
+
+            if (isBusy) {
+                el.style.opacity = '0.5';
+                el.title = 'Ocupado en las fechas seleccionadas';
+                // Add visual indicator
+                if (!el.querySelector('.busy-indicator')) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'busy-indicator w-2 h-2 rounded-full bg-warning absolute -top-1 -right-1';
+                    el.style.position = 'relative';
+                    el.appendChild(indicator);
+                }
+            } else {
+                el.style.opacity = '1';
+                el.title = 'Disponible';
+                const indicator = el.querySelector('.busy-indicator');
+                if (indicator) indicator.remove();
+            }
+        });
+
+        // Check all vehicles
+        document.querySelectorAll('.vehiculo-card').forEach(el => {
+            const id = parseInt(el.dataset.id);
+            const isBusy = eventosData.some(evento => {
+                const eventoFecha = evento.fecha_inicio.split(' ')[0];
+                return diasSeleccionados.includes(eventoFecha) && evento.vehiculo_id === id;
+            });
+
+            const badge = el.querySelector('.rounded-full.text-xs');
+            if (isBusy) {
+                el.classList.add('in-use');
+                if (badge) {
+                    badge.className = 'px-2 py-1 text-xs rounded-full bg-warning-light text-warning';
+                    badge.textContent = 'Ocupado';
+                }
+            } else {
+                el.classList.remove('in-use');
+                if (badge) {
+                    badge.className = 'px-2 py-1 text-xs rounded-full bg-success-light text-success';
+                    badge.textContent = 'Disponible';
+                }
+            }
+        });
+    }
+
+    // Hook into selection changes
+    const originalToggleDia = toggleDia;
+    toggleDia = function(element, event) {
+        originalToggleDia(element, event);
+        checkConflicts();
+    };
+
+    const originalSeleccionarSemana = seleccionarSemana;
+    seleccionarSemana = function() {
+        originalSeleccionarSemana();
+        checkConflicts();
+    };
+
+    const originalLimpiarSeleccion = limpiarSeleccion;
+    limpiarSeleccion = function() {
+        originalLimpiarSeleccion();
+        checkConflicts();
+    };
+
 
     // Submit form editar
     document.getElementById('form-editar').addEventListener('submit', function(e) {
@@ -852,6 +1038,176 @@
             });
         });
     });
+
+    // Configuración de horario
+    let configHorario = JSON.parse(localStorage.getItem('configHorario')) || {
+        inicio: '08:00',
+        fin: '18:00'
+    };
+
+    // Inicializar inputs de configuración
+    document.getElementById('config-inicio').value = configHorario.inicio;
+    document.getElementById('config-fin').value = configHorario.fin;
+
+    // Funciones del modal de configuración
+    function openConfigModal() {
+        document.getElementById('modal-config').classList.remove('hidden');
+    }
+
+    function cerrarConfigModal() {
+        document.getElementById('modal-config').classList.add('hidden');
+    }
+
+    document.getElementById('form-config').addEventListener('submit', function(e) {
+        e.preventDefault();
+        configHorario.inicio = document.getElementById('config-inicio').value;
+        configHorario.fin = document.getElementById('config-fin').value;
+        localStorage.setItem('configHorario', JSON.stringify(configHorario));
+        
+        cerrarConfigModal();
+        checkConflicts(); // Revalidar con nuevo horario
+        
+        Swal.fire({
+            icon: 'success',
+            title: 'Configuración guardada',
+            timer: 1500,
+            showConfirmButton: false
+        });
+    });
+
+    // Validar conflictos visualmente al seleccionar
+    function checkConflicts() {
+        // Reset visual states
+        document.querySelectorAll('.repartidor-chip').forEach(el => {
+            if (!el.classList.contains('selected')) {
+                el.style.opacity = '1';
+                el.title = '';
+            }
+        });
+        
+        document.querySelectorAll('.vehiculo-card').forEach(el => {
+            if (!el.classList.contains('selected')) {
+                el.classList.remove('in-use');
+                const badge = el.querySelector('.rounded-full.text-xs');
+                if (badge) {
+                     if (el.dataset.enUso === 'false') {
+                         badge.className = 'px-2 py-1 text-xs rounded-full bg-success-light text-success';
+                         badge.textContent = 'Libre';
+                     }
+                }
+            }
+        });
+
+        if (diasSeleccionados.length === 0) return;
+
+        // Helper para verificar superposición de horarios
+        const checkOverlap = (evento) => {
+            // Fechas del evento
+            const eventoInicio = new Date(evento.fecha_inicio.replace(' ', 'T'));
+            const eventoFin = new Date(evento.fecha_fin.replace(' ', 'T'));
+            
+            // Verificar si el evento ocurre en alguno de los días seleccionados
+            const eventoDia = eventoInicio.toISOString().split('T')[0];
+            if (!diasSeleccionados.includes(eventoDia)) return false;
+
+            // Crear rango de búsqueda para ese día específico
+            const busquedaInicio = new Date(`${eventoDia}T${configHorario.inicio}:00`);
+            const busquedaFin = new Date(`${eventoDia}T${configHorario.fin}:00`);
+
+            // Lógica de superposición: (StartA < EndB) && (EndA > StartB)
+            return eventoInicio < busquedaFin && eventoFin > busquedaInicio;
+        };
+
+        // Check repartidores conflicts
+        repartidoresSeleccionados.forEach(rep => {
+            const hasConflict = eventosData.some(evento => {
+                return evento.repartidor_id === rep.id && checkOverlap(evento);
+            });
+            
+            if (hasConflict) {
+                // Visual feedback
+            }
+        });
+
+        // Check vehicle conflicts
+        if (vehiculoSeleccionado) {
+             const hasConflict = eventosData.some(evento => {
+                return evento.vehiculo_id === vehiculoSeleccionado.id && checkOverlap(evento);
+            });
+            
+            if (hasConflict) {
+                 // Visual feedback
+            }
+        }
+        
+        // Update availability status for ALL items based on selected dates
+        updateAvailabilityStatus();
+    }
+
+    function updateAvailabilityStatus() {
+        if (diasSeleccionados.length === 0) return;
+
+        // Helper para verificar superposición (reutilizado)
+        const checkOverlap = (evento) => {
+            const eventoInicio = new Date(evento.fecha_inicio.replace(' ', 'T'));
+            const eventoFin = new Date(evento.fecha_fin.replace(' ', 'T'));
+            const eventoDia = eventoInicio.toISOString().split('T')[0];
+            
+            if (!diasSeleccionados.includes(eventoDia)) return false;
+
+            const busquedaInicio = new Date(`${eventoDia}T${configHorario.inicio}:00`);
+            const busquedaFin = new Date(`${eventoDia}T${configHorario.fin}:00`);
+
+            return eventoInicio < busquedaFin && eventoFin > busquedaInicio;
+        };
+
+        // Check all repartidores
+        document.querySelectorAll('.repartidor-chip').forEach(el => {
+            const id = parseInt(el.dataset.id);
+            const isBusy = eventosData.some(evento => {
+                return evento.repartidor_id === id && checkOverlap(evento);
+            });
+
+            if (isBusy) {
+                el.style.opacity = '0.5';
+                el.title = `Ocupado en horario ${configHorario.inicio} - ${configHorario.fin}`;
+                if (!el.querySelector('.busy-indicator')) {
+                    const indicator = document.createElement('span');
+                    indicator.className = 'busy-indicator w-2 h-2 rounded-full bg-warning absolute -top-1 -right-1';
+                    el.style.position = 'relative';
+                    el.appendChild(indicator);
+                }
+            } else {
+                el.style.opacity = '1';
+                el.title = 'Disponible';
+                const indicator = el.querySelector('.busy-indicator');
+                if (indicator) indicator.remove();
+            }
+        });
+
+        // Check all vehicles
+        document.querySelectorAll('.vehiculo-card').forEach(el => {
+            const id = parseInt(el.dataset.id);
+            const isBusy = eventosData.some(evento => {
+                return evento.vehiculo_id === id && checkOverlap(evento);
+            });
+
+            const badge = el.querySelector('.rounded-full.text-xs');
+            if (isBusy) {
+                el.classList.add('in-use');
+                if (badge) {
+                    badge.className = 'px-2 py-1 text-xs rounded-full bg-warning-light text-warning';
+                    badge.textContent = 'Ocupado';
+                }
+            } else {
+                el.classList.remove('in-use');
+                if (badge) {
+                    badge.className = 'px-2 py-1 text-xs rounded-full bg-success-light text-success';
+                    badge.textContent = 'Disponible';
+                }
+            }
+        });
+    }
 
     // Logout confirmation
     function confirmLogout() {
