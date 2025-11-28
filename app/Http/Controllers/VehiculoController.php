@@ -43,7 +43,7 @@ class VehiculoController extends Controller
             'placa' => 'required|string|max:20|unique:vehiculos,placa',
             'anio' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
             'capacidad' => 'nullable|string|max:50',
-            'estado' => 'required|in:disponible,en_uso,mantenimiento,inactivo',
+            'estado' => 'required|in:disponible,asignado,mantenimiento,inactivo',
             'observaciones' => 'nullable|string|max:500',
             'fotos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
@@ -72,6 +72,7 @@ class VehiculoController extends Controller
 
     public function edit(Vehiculo $vehiculo)
     {
+        // dd($vehiculo);
         return view('vehiculos.edit', compact('vehiculo'));
     }
 
@@ -83,7 +84,7 @@ class VehiculoController extends Controller
             'placa' => 'required|string|max:20|unique:vehiculos,placa,' . $vehiculo->id,
             'anio' => 'nullable|integer|min:1900|max:' . (date('Y') + 1),
             'capacidad' => 'nullable|string|max:50',
-            'estado' => 'required|in:disponible,en_uso,mantenimiento,inactivo',
+            'estado' => 'required|in:disponible,asignado,mantenimiento,inactivo',
             'observaciones' => 'nullable|string|max:500',
             'fotos.*' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:5120',
         ]);
