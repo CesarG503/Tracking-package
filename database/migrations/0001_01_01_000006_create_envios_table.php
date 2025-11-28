@@ -19,6 +19,7 @@ return new class extends Migration
             // Destinatario
             $table->string('destinatario_nombre', 120);
             $table->string('destinatario_telefono', 30)->nullable();
+            $table->string('destinatario_email', 200)->isNotEmpty();
             $table->text('destinatario_direccion');
             
             // Paquete

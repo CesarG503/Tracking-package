@@ -19,6 +19,7 @@ class Envio extends Model
         'remitente_direccion',
         'destinatario_nombre',
         'destinatario_telefono',
+        'destinatario_email',
         'destinatario_direccion',
         'descripcion',
         'foto_paquete',
