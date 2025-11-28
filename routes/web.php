@@ -25,3 +25,4 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('usuarios', UserController::class);
     Route::patch('usuarios/{usuario}/toggle-active', [UserController::class, 'toggleActive'])->name('usuarios.toggle-active');
 });
+
