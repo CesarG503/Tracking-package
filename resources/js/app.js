@@ -44,6 +44,9 @@ window.toggleTheme = function() {
     
     localStorage.setItem('theme', newTheme);
     updateThemeToggle(newTheme);
+    
+    // Dispatch custom event for map and other components
+    window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme: newTheme } }));
 };
 
 // Update toggle button appearance
