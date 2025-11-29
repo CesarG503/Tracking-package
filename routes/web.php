@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DisponibilidadController;
+use App\Livewire\Counter;
 use Illuminate\Support\Facades\Route;
 
 // Public routes
@@ -12,6 +13,7 @@ Route::get('/', function () {
     return redirect()->route('login');
 });
 
+Route::get('/livewire-test', Counter::class);
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

@@ -17,6 +17,7 @@
     @endif
     
     @stack('styles')
+    @livewireStyles
 </head>
 <body class="font-sans antialiased bg-gradient-to-br from-blue-50 via-sky-50 to-cyan-50 min-h-screen">
     @yield('content')
@@ -60,5 +61,7 @@
         });
     </script>
     @endif
+
+    <script src="vendor/livewire/livewire.js" data-csrf="{{ csrf_token() }}" data-update-uri="{{ route('livewire.update') }}" data-navigate-once="true"></script>
 </body>
 </html>
