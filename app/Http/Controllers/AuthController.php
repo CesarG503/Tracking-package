@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\LogSistema;
@@ -16,16 +17,9 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ], [
-            'email.required' => 'El correo electrónico es requerido.',
-            'email.email' => 'Ingrese un correo electrónico válido.',
-            'password.required' => 'La contraseña es requerida.',
-        ]);
+        $credentials = $request->validated();
 
         // Check if user exists and is active
         $user = \App\Models\User::where('email', $credentials['email'])->first();
