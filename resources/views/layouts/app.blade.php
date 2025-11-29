@@ -19,10 +19,37 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
 
+    {{-- Theme Detection Script - Runs before page render to prevent flash --}}
+    <script>
+        (function() {
+            'use strict';
+            
+            // Function to apply theme immediately
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+            
+            // Check for saved theme preference
+            const savedTheme = localStorage.getItem('theme');
+            
+            if (savedTheme) {
+                // Use saved preference
+                applyTheme(savedTheme);
+            } else {
+                // Check system preference
+                const systemPrefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                applyTheme(systemPrefersDark ? 'dark' : 'light');
+            }
+        })();
+    </script>
     
     @stack('styles')
 </head>
-<body class="font-sans antialiased bg-gradient-to-br from-blue-50 via-sky-50 to-cyan-50 min-h-screen">
+<body class="font-sans antialiased bg-background from-blue-50 via-sky-50 to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 min-h-screen transition-colors duration-300">
     @yield('content')
     
     {{-- Added global scripts stack --}}

@@ -5,65 +5,27 @@
 @section('content')
 <div class="flex h-screen overflow-hidden">
     <!-- Sidebar -->
-    <aside class="w-20 glass-sidebar flex flex-col items-center py-6 gap-2">
-        <!-- Logo -->
-        <div class="w-12 h-12 bg-gradient-to-br from-primary to-primary-hover rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-primary/30">
-            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-            </svg>
-        </div>
-
-        <!-- Nav Items -->
-        <nav class="flex-1 flex flex-col gap-2">
-            <a href="{{ route('dashboard') }}" class="w-12 h-12 rounded-xl {{ request()->routeIs('dashboard') ? 'bg-primary/10 text-primary' : 'text-foreground-muted hover:bg-surface-secondary hover:text-foreground' }} flex items-center justify-center transition-colors" title="Dashboard">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-                </svg>
-            </a>
-            <a href="{{ route('vehiculos.index') }}" class="w-12 h-12 rounded-xl {{ request()->routeIs('vehiculos.*') ? 'bg-primary/10 text-primary' : 'text-foreground-muted hover:bg-surface-secondary hover:text-foreground' }} flex items-center justify-center transition-colors" title="Vehiculos">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                </svg>
-            </a>
-            <a href="{{ route('usuarios.index') }}" class="w-12 h-12 rounded-xl {{ request()->routeIs('usuarios.*') ? 'bg-primary/10 text-primary' : 'text-foreground-muted hover:bg-surface-secondary hover:text-foreground' }} flex items-center justify-center transition-colors" title="Usuarios">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-                </svg>
-            </a>
-        </nav>
-
-        <!-- Bottom Nav -->
-        <div class="flex flex-col gap-2">
-            <form action="{{ route('logout') }}" method="POST" id="logout-form">
-                @csrf
-                <button type="button" onclick="confirmLogout()" class="w-12 h-12 rounded-xl text-foreground-muted flex items-center justify-center hover:bg-danger-light hover:text-danger transition-colors" title="Cerrar Sesion">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                    </svg>
-                </button>
-            </form>
-        </div>
-    </aside>
+    @include('partials.sidebar')
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col lg:flex-row overflow-hidden">
         <!-- Left Panel - Package List -->
-        <div class="order-2 lg:order-1 w-full lg:w-[420px] glass-sidebar border-r border-white/20 flex flex-col overflow-hidden h-auto lg:h-full">
+        <div class="order-2 lg:order-1 w-full lg:w-[420px] glass-sidebar dark:glass-sidebar-dark border-r border-white/20 dark:border-white/10 flex flex-col overflow-hidden h-auto lg:h-full transition-colors duration-300">
             <!-- Mobile Toggle Button -->
-            <button id="mobile-toggle" class="lg:hidden w-full p-3 flex items-center justify-center gap-2 border-b border-border bg-surface-secondary/50 backdrop-blur-sm">
-                <svg class="w-5 h-5 text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button id="mobile-toggle" class="lg:hidden w-full p-3 flex items-center justify-center gap-2 border-b border-border dark:border-border bg-surface-secondary/50 dark:bg-surface-secondary/50 backdrop-blur-sm transition-colors duration-300">
+                <svg class="w-5 h-5 text-foreground dark:text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
                 </svg>
-                <span class="text-sm font-medium text-foreground">Ver Envíos</span>
+                <span class="text-sm font-medium text-foreground dark:text-foreground">Ver Envíos</span>
             </button>
             
             <!-- Collapsible Content -->
             <div id="mobile-content" class="flex flex-col overflow-hidden max-h-0 lg:max-h-full lg:flex-1 transition-none lg:transition-all duration-300">
             <!-- Header -->
-            <div class="p-4 lg:p-6 border-b border-border">
+            <div class="p-4 lg:p-6 border-b border-border dark:border-border transition-colors duration-300">
                 <div class="flex items-center justify-between mb-4">
-                    <h1 class="text-xl font-bold text-foreground">Seguimiento de Envios</h1>
-                    <button class="w-10 h-10 rounded-xl bg-surface-secondary flex items-center justify-center text-foreground-muted hover:bg-border transition-colors">
+                    <h1 class="text-xl font-bold text-foreground dark:text-foreground">Seguimiento de Envios</h1>
+                    <button class="w-10 h-10 rounded-xl bg-surface-secondary dark:bg-surface-secondary flex items-center justify-center text-foreground-muted dark:text-foreground-muted hover:bg-border dark:hover:bg-border transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
                         </svg>
@@ -72,10 +34,10 @@
 
                 <!-- Tabs -->
                 <div class="flex gap-2">
-                    <button class="px-4 py-2 bg-foreground text-background rounded-full text-sm font-medium">
+                    <button class="px-4 py-2 bg-foreground dark:bg-foreground text-background dark:text-background rounded-full text-sm font-medium">
                         En camino
                     </button>
-                    <button class="px-4 py-2 text-foreground-muted hover:bg-surface-secondary rounded-full text-sm font-medium transition-colors">
+                    <button class="px-4 py-2 text-foreground-muted dark:text-foreground-muted hover:bg-surface-secondary dark:hover:bg-surface-secondary rounded-full text-sm font-medium transition-colors">
                         Recibidos
                     </button>
                 </div>
@@ -84,18 +46,18 @@
             <!-- Package List -->
             <div class="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3">
                 @forelse($enviosEnRuta as $envio)
-                <div class="glass-card rounded-2xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 {{ $loop->first ? 'glass-card-active text-white' : '' }} envio-card" data-target="details-envio-{{ $envio->id }}">
+                <div class="glass-card dark:glass-card-dark rounded-2xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 {{ $loop->first ? 'glass-card-active dark:glass-card-active-dark text-white' : '' }} envio-card" data-target="details-envio-{{ $envio->id }}">
                     <div class="flex items-center justify-between mb-3">
                         <div>
-                            <h3 class="font-semibold {{ $loop->first ? 'text-white' : 'text-foreground' }}">
+                            <h3 class="font-semibold {{ $loop->first ? 'text-white' : 'text-foreground dark:text-foreground' }}">
                                 {{ Str::limit($envio->remitente_direccion, 15) }} → {{ Str::limit($envio->destinatario_direccion, 15) }}
                             </h3>
-                            <p class="text-sm {{ $loop->first ? 'text-blue-100' : 'text-foreground-muted' }}">
+                            <p class="text-sm {{ $loop->first ? 'text-blue-100' : 'text-foreground-muted dark:text-foreground-muted' }}">
                                 Order ID #{{ str_pad($envio->id, 5, '0', STR_PAD_LEFT) }}-{{ rand(10000,99999) }}
                             </p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="status-badge px-3 py-1 rounded-full text-xs font-medium {{ $loop->first ? 'bg-white/20 text-white' : 'bg-warning-light text-warning' }}">
+                            <span class="status-badge px-3 py-1 rounded-full text-xs font-medium {{ $loop->first ? 'bg-white/20 text-white' : 'bg-warning-light dark:bg-warning-light text-warning dark:text-warning' }}">
                                 En Ruta
                             </span>
                             @if(!$envio->repartidor)
@@ -138,7 +100,7 @@
                     @endphp
                     <button
                         type="button"
-                        class="toggle-details w-full py-2.5 {{ $loop->first ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-surface-secondary hover:bg-border text-foreground' }} rounded-xl text-sm font-medium transition-colors"
+                        class="toggle-details w-full py-2.5 {{ $loop->first ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-surface-secondary hover:bg-foreground-muted/35 text-foreground' }} rounded-xl text-sm font-medium transition-colors"
                         data-target="details-envio-{{ $envio->id }}"
                         data-lat="{{ $latReal }}"
                         data-lng="{{ $lngReal }}"
