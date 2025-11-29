@@ -92,7 +92,7 @@
                                 <select name="estado" id="estado" required 
                                     class="w-full px-4 py-3 bg-surface-secondary border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent cursor-pointer @error('estado') !border-danger !ring-danger @enderror">
                                     <option value="disponible" {{ old('estado') === 'disponible' ? 'selected' : '' }}>Disponible</option>
-                                    <option value="en_uso" {{ old('estado') === 'en_uso' ? 'selected' : '' }}>En uso</option>
+                                    <option value="asignado" {{ old('estado') === 'asignado' ? 'selected' : '' }}>Asignado</option>
                                     <option value="mantenimiento" {{ old('estado') === 'mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
                                     <option value="inactivo" {{ old('estado') === 'inactivo' ? 'selected' : '' }}>Inactivo</option>
                                 </select>

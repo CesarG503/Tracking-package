@@ -43,7 +43,7 @@
                         <select name="estado" id="estado-filter" class="px-4 py-3 bg-surface-secondary border border-border rounded-xl min-w-[160px] text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
                             <option value="">Todos los estados</option>
                             <option value="disponible" {{ request('estado') === 'disponible' ? 'selected' : '' }}>Disponible</option>
-                            <option value="en_uso" {{ request('estado') === 'en_uso' ? 'selected' : '' }}>En uso</option>
+                            <option value="asignado" {{ request('estado') === 'asignado' ? 'selected' : '' }}>Asignado</option>
                             <option value="mantenimiento" {{ request('estado') === 'mantenimiento' ? 'selected' : '' }}>Mantenimiento</option>
                             <option value="inactivo" {{ request('estado') === 'inactivo' ? 'selected' : '' }}>Inactivo</option>
                         </select>
@@ -83,14 +83,15 @@
                                 @php
                                     $statusColors = [
                                         'disponible' => 'bg-success',
-                                        'en_uso' => 'bg-primary',
+                                        'asignado' => 'bg-primary',
                                         'mantenimiento' => 'bg-warning',
                                         'inactivo' => 'bg-danger',
                                     ];
                                 @endphp
                                 <tr class="cursor-pointer vehiculo-row hover:bg-surface-secondary/50 transition-colors" 
                                     data-id="{{ $vehiculo->id }}" 
-                                    onclick="selectVehiculo({{ $vehiculo->id }}, '{{ $vehiculo->marca }}', '{{ $vehiculo->modelo }}', '{{ $vehiculo->placa }}', '{{ $vehiculo->anio }}', '{{ $vehiculo->estado }}', '{{ addslashes($vehiculo->observaciones) }}', {{ json_encode(json_decode($vehiculo->foto, true) ?? []) }})">
+                                    onclick="selectVehiculo({{ $vehiculo->id }}, '{{ $vehiculo->marca }}', '{{ $vehiculo->modelo }}', '{{ $vehiculo->placa }}', '{{ $vehiculo->anio }}', '{{ $vehiculo->estado }}', '{{ addslashes($vehiculo->observaciones) }}', {{ json_encode(json_decode($vehiculo->foto, true) ?? []) }})"
+                                    ondblclick="window.location.href='{{ route('vehiculos.show', $vehiculo) }}'">
                                     <td class="px-6 py-4">
                                         <div class="flex items-center gap-3">
                                             <span class="w-3 h-3 rounded-full {{ $statusColors[$vehiculo->estado] ?? 'bg-foreground-muted' }} ring-4 ring-opacity-20 {{ str_replace('bg-', 'ring-', $statusColors[$vehiculo->estado] ?? 'ring-foreground-muted') }}"></span>
@@ -249,13 +250,13 @@ function selectVehiculo(id, marca, modelo, placa, anio, estado, observaciones, f
     // Status
     const statusColors = {
         'disponible': 'bg-success',
-        'en_uso': 'bg-primary',
+        'asignado': 'bg-primary',
         'mantenimiento': 'bg-warning',
         'inactivo': 'bg-danger'
     };
     const statusLabels = {
         'disponible': 'Disponible',
-        'en_uso': 'En uso',
+        'asignado': 'Asignado',
         'mantenimiento': 'Mantenimiento',
         'inactivo': 'Inactivo'
     };
