@@ -9,30 +9,9 @@ use Illuminate\Validation\Rules\Password;
 
 class UserController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = User::query();
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('nombre', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('telefono', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('rol')) {
-            $query->where('rol', $request->rol);
-        }
-
-        if ($request->filled('activo')) {
-            $query->where('activo', $request->activo === '1');
-        }
-
-        $usuarios = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        return view('usuarios.index', compact('usuarios'));
+        return view('usuarios.index');
     }
 
     public function create()

@@ -8,26 +8,9 @@ use Illuminate\Support\Facades\Storage;
 
 class VehiculoController extends Controller
 {
-    public function index(Request $request)
+    public function index()
     {
-        $query = Vehiculo::query();
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function ($q) use ($search) {
-                $q->where('marca', 'like', "%{$search}%")
-                    ->orWhere('modelo', 'like', "%{$search}%")
-                    ->orWhere('placa', 'like', "%{$search}%");
-            });
-        }
-
-        if ($request->filled('estado')) {
-            $query->where('estado', $request->estado);
-        }
-
-        $vehiculos = $query->orderBy('created_at', 'desc')->paginate(10);
-
-        return view('vehiculos.index', compact('vehiculos'));
+        return view('vehiculos.index');
     }
 
     public function create()
