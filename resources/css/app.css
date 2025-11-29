@@ -7,7 +7,7 @@
     /* Blue-600 */
 
     /* Colores de Fondo */
-    --color-background: #f8fafc;
+    --color-background: #F5FBFF;
     /* Griz muy claro, suave para la vista */
     --color-surface: #ffffff;
     /* Blanco para tarjetas y contenedores */
@@ -46,21 +46,21 @@
 
 :root.dark {
     /* Colores Principales */
-    --color-primary: #14b8a6;
-    /* Teal brillante */
-    --color-primary-hover: #2dd4bf;
+    --color-primary: #3b82f6;
+    /* Mantener consistencia con tema claro */
+    --color-primary-hover: #2563eb;
 
     /* Colores de Fondo */
     --color-background: #0f172a;
-    /* Azul oscuro suave (mejor que negro puro) */
+    /* Azul oscuro suave */
     --color-surface: #1e293b;
     /* Gris azulado para tarjetas */
     --color-surface-secondary: #334155;
     /* Gris medio para secciones alternas */
 
     /* Colores de Texto */
-    --color-foreground: #f1f5f9;
-    /* Gris muy claro para texto principal */
+    --color-foreground: #f8fafc;
+    /* Texto principal más claro */
     --color-foreground-muted: #94a3b8;
     /* Gris claro para texto secundario */
 
@@ -68,18 +68,19 @@
     --color-success: #10b981;
     /* Esmeralda brillante */
     --color-success-hover: #059669;
-    /* Hover más oscuro para success */
     --color-success-light: #064e3b;
     --color-warning: #f59e0b;
     /* Ámbar brillante */
     --color-warning-hover: #d97706;
-    /* Hover más oscuro para warning */
     --color-warning-light: #78350f;
     --color-danger: #f43f5e;
     /* Rosa-rojo brillante */
     --color-danger-hover: #e11d48;
-    /* Hover más oscuro para danger */
     --color-danger-light: #881337;
+    --color-info: #0ea5e9;
+    /* Info color */
+    --color-info-hover: #0284c7;
+    --color-info-light: #0c4a6e;
 
     /* Bordes y Divisores */
     --color-border: #334155;
@@ -89,30 +90,51 @@
 
 @layer components {
     .glass {
-        background: rgba(255, 255, 255, 0.7);
+        background: var(--color-surface);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
+        border: 1px solid var(--color-border);
     }
 
     .glass-dark {
-        background: rgba(30, 41, 59, 0.7);
+        background: rgba(30, 41, 59, 0.8);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.1);
     }
 
+    .glass-sidebar-dark {
+        background: rgba(30, 41, 59, 0.9);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .glass-card-dark {
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .glass-card-active-dark {
+        background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+        border: none;
+        box-shadow: 0 8px 32px rgba(59, 130, 246, 0.4);
+    }
+
     .glass-sidebar {
-        background: rgba(255, 255, 255, 0.85);
+        background: var(--color-surface-secondary);
         backdrop-filter: blur(24px);
         -webkit-backdrop-filter: blur(24px);
     }
 
     .glass-card {
-        background: rgba(255, 255, 255, 0.6);
+        background: var(--color-surface);
         backdrop-filter: blur(16px);
         -webkit-backdrop-filter: blur(16px);
-        border: 1px solid rgba(255, 255, 255, 0.4);
+        border: 1px solid var(--color-border);
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     }
 
