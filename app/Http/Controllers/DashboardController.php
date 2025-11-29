@@ -36,6 +36,12 @@ class DashboardController extends Controller
             'vehiculos_disponibles' => Vehiculo::where('estado', 'disponible')->count(),
         ];
 
-        return view('dashboard', compact('enviosEnRuta', 'enviosPendientes', 'enviosEntregados', 'stats'));
+        // Coordenadas de la empresa
+        $empresaCoordenadas = [
+            'lat' => 13.439624,
+            'lng' => -88.157400
+        ];
+
+        return view('dashboard', compact('enviosEnRuta', 'enviosPendientes', 'enviosEntregados', 'stats', 'empresaCoordenadas'));
     }
 }
