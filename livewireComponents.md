@@ -1,10 +1,4 @@
-# Documentación de Componentes Livewire
-
-Aquí detallo el proceso, los comandos y la lógica utilizada para implementar los componentes de **Usuarios** y **Vehículos** con actualizaciones en tiempo real.
-
 ## 1. Comandos Utilizados
-
-Aunque como asistente de IA creé los archivos directamente, en un flujo de trabajo normal de Laravel se utilizan los siguientes comandos de Artisan para generar la estructura base:
 
 ```bash
 # Para crear el componente de Usuarios
@@ -20,7 +14,7 @@ Estos comandos generan dos archivos por cada componente:
 
 ## 2. Lógica de Conexión y Tiempo Real
 
-La "magia" de la actualización en tiempo real y la interactividad sin recargar la página se basa en tres conceptos clave de Livewire que implementé:
+La actualización en tiempo real y la interactividad sin recargar la página se basa en tres conceptos clave de Livewire que implementé:
 
 ### A. Polling (`wire:poll`)
 Para lograr que "si otro admin agrega un usuario/vehículo se muestre de manera inmediata", utilicé la directiva `wire:poll`.
