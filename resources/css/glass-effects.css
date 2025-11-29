@@ -1,0 +1,490 @@
+/**
+ * Glass Effects CSS Framework
+ * Sistema de clases reutilizables para efectos de cristal
+ * Basado en los glass-elements originales
+ */
+
+/* Variables CSS para personalización */
+:root {
+  /* Colores base */
+  --glass-bg-color: rgba(255, 255, 255, 0.4);
+  --glass-border-color: rgba(255, 255, 255, 0.3);
+  --glass-shadow-color: rgba(0, 0, 0, 0.04);
+  
+  /* Dimensiones */
+  --glass-padding: 16px 24px;
+  --glass-radius: 16px;
+  
+  /* Efectos */
+  --glass-blur: 2px;
+  --glass-depth: 10;
+  --glass-strength: 100;
+  --glass-chromatic: 0;
+  
+  /* Transiciones */
+  --glass-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Clase base para elementos de cristal */
+.glass {
+  position: relative;
+  background: var(--glass-bg-color);
+  border: 1px solid var(--glass-border-color);
+  border-radius: var(--glass-radius);
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: 
+    1px 1px 1px 0px rgba(255,255,255, 0.60) inset, 
+    -1px -1px 1px 0px rgba(255,255,255, 0.60) inset, 
+    0px 0px 16px 0px var(--glass-shadow-color);
+  transition: var(--glass-transition);
+  overflow: hidden;
+}
+
+/* Estados interactivos */
+.glass:hover {
+  background: rgba(255, 255, 255, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 
+    1px 1px 1px 0px rgba(255,255,255, 0.70) inset, 
+    -1px -1px 1px 0px rgba(255,255,255, 0.70) inset, 
+    0px 4px 20px 0px rgba(0, 0, 0, 0.08);
+}
+
+.glass:active {
+  transform: scale(0.98) translateY(0px);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Tamaños predefinidos */
+.glass-xs {
+  padding: 8px 12px;
+  --glass-radius: 8px;
+  font-size: 0.75rem;
+}
+
+.glass-sm {
+  padding: 12px 16px;
+  --glass-radius: 12px;
+  font-size: 0.875rem;
+}
+
+.glass-md {
+  padding: 16px 24px;
+  --glass-radius: 16px;
+  font-size: 1rem;
+}
+
+.glass-lg {
+  padding: 20px 32px;
+  --glass-radius: 20px;
+  font-size: 1.125rem;
+}
+
+.glass-xl {
+  padding: 24px 40px;
+  --glass-radius: 24px;
+  font-size: 1.25rem;
+}
+
+/* Variantes de forma */
+.glass-square {
+  border-radius: 0;
+}
+
+.glass-rounded {
+  border-radius: 8px;
+}
+
+.glass-pill {
+  border-radius: 50px;
+}
+
+.glass-circle {
+  border-radius: 50%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Variantes de intensidad */
+.glass-subtle {
+  --glass-bg-color: rgba(255, 255, 255, 0.2);
+  --glass-blur: 1px;
+  backdrop-filter: blur(1px);
+}
+
+.glass-medium {
+  --glass-bg-color: rgba(255, 255, 255, 0.4);
+  --glass-blur: 2px;
+  backdrop-filter: blur(2px);
+}
+
+.glass-strong {
+  --glass-bg-color: rgba(255, 255, 255, 0.6);
+  --glass-blur: 4px;
+  backdrop-filter: blur(4px);
+}
+
+/* Variantes de color */
+.glass-blue {
+  --glass-bg-color: rgba(59, 130, 246, 0.3);
+  --glass-border-color: rgba(59, 130, 246, 0.4);
+}
+
+.glass-green {
+  --glass-bg-color: rgba(34, 197, 94, 0.3);
+  --glass-border-color: rgba(34, 197, 94, 0.4);
+}
+
+.glass-purple {
+  --glass-bg-color: rgba(147, 51, 234, 0.3);
+  --glass-border-color: rgba(147, 51, 234, 0.4);
+}
+
+.glass-pink {
+  --glass-bg-color: rgba(236, 72, 153, 0.3);
+  --glass-border-color: rgba(236, 72, 153, 0.4);
+}
+
+.glass-amber {
+  --glass-bg-color: rgba(245, 158, 11, 0.3);
+  --glass-border-color: rgba(245, 158, 11, 0.4);
+}
+
+.glass-red {
+  --glass-bg-color: rgba(239, 68, 68, 0.3);
+  --glass-border-color: rgba(239, 68, 68, 0.4);
+}
+
+.glass-dark {
+  --glass-bg-color: rgba(0, 0, 0, 0.3);
+  --glass-border-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+/* Efectos especiales */
+.glass-glow {
+  box-shadow: 
+    1px 1px 1px 0px rgba(255,255,255, 0.60) inset, 
+    -1px -1px 1px 0px rgba(255,255,255, 0.60) inset, 
+    0px 0px 16px 0px var(--glass-shadow-color),
+    0px 0px 32px 0px rgba(255, 255, 255, 0.1);
+}
+
+.glass-shadow-lg {
+  box-shadow: 
+    1px 1px 1px 0px rgba(255,255,255, 0.60) inset, 
+    -1px -1px 1px 0px rgba(255,255,255, 0.60) inset, 
+    0px 10px 30px 0px rgba(0, 0, 0, 0.1);
+}
+
+.glass-border-thick {
+  border-width: 2px;
+}
+
+.glass-border-none {
+  border: none;
+}
+
+/* Clases de utilidad */
+.glass-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.glass-loading {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-loading::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: glass-shimmer 2s infinite;
+}
+
+@keyframes glass-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Responsividad */
+@media (max-width: 768px) {
+  .glass-responsive {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+  }
+  
+  .glass-lg.glass-responsive {
+    padding: 16px 24px;
+    font-size: 1rem;
+  }
+  
+  .glass-xl.glass-responsive {
+    padding: 20px 32px;
+    font-size: 1.125rem;
+  }
+}
+
+@media (max-width: 480px) {
+  
+  .glass-lg.glass-responsive,
+  .glass-xl.glass-responsive {
+    padding: 12px 18px;
+    font-size: 0.9rem;
+  }
+}
+
+/* Clases para contenedores */
+.glass-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 500;
+}
+
+.glass-container.left {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.glass-container.right {
+  justify-content: flex-end;
+  text-align: right;
+}
+
+/* Clase base para elementos con filtros SVG avanzados */
+.glass-advanced {
+  /* Placeholder para elementos que serán mejorados con JavaScript */
+  position: relative;
+  /* Estilos por defecto que serán sobrescritos por JavaScript */
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              backdrop-filter 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              filter 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Por defecto, glass-advanced no tiene efectos de hover */
+.glass-advanced:hover {
+  transform: none;
+}
+
+.glass-advanced:active {
+  transform: scale(0.98);
+}
+
+/* Clase para habilitar efectos de hover */
+.glass-advanced.with-hover-effects:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.glass-advanced.with-hover-effects:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+/* ========== NAVEGACIÓN LIQUID GLASS ========== */
+
+.glass-nav {
+    border-radius: 25px;
+    padding: 15px 30px;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* Preservar backdrop-filter sin afectar con transiciones */
+}
+
+.glass-nav:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.glass-nav a {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-nav a:hover {
+    transform: translateY(-1px);
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.glass-nav-horizontal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.glass-nav-vertical {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 250px;
+    min-height: 400px;
+}
+
+/* ========== FORMULARIOS LIQUID GLASS ========== */
+
+.glass-form {
+    border-radius: 25px;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* ========== INPUTS LIQUID GLASS ========== */
+
+/* Input con backdrop-filter */
+.glass-input {
+    width: 100%;
+    max-width: 100%;
+    padding: 18px 25px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    outline: none;
+    border-radius: 20px;
+    color: white;
+    font-size: 1rem;
+    font-weight: 300;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.3s ease,
+                background-color 0.3s ease;
+    resize: vertical;
+    position: relative;
+    box-sizing: border-box;
+}
+
+.glass-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 300;
+}
+
+/* Estados de hover y focus para inputs */
+.glass-input:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.glass-input:focus {
+    transform: translateY(-3px);
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.2),
+        0 12px 35px rgba(0, 0, 0, 0.2),
+        0 0 0 2px rgba(255, 255, 255, 0.1);
+}
+
+/* Input compacto */
+.glass-input-sm {
+    padding: 12px 18px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Input grande */
+.glass-input-lg {
+    padding: 18px 25px;
+    border-radius: 20px;
+    font-size: 1.05rem;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* Variaciones de color para inputs */
+.glass-input-blue {
+    background: rgba(100, 200, 255, 0.08);
+    border-color: rgba(100, 200, 255, 0.3);
+}
+
+.glass-input-blue:focus {
+    border-color: rgba(100, 200, 255, 0.5);
+    box-shadow: 
+        inset 0 1px 0 rgba(100, 200, 255, 0.2),
+        0 12px 35px rgba(0, 0, 0, 0.2),
+        0 0 0 2px rgba(100, 200, 255, 0.2);
+}
+
+.glass-input-green {
+    background: rgba(100, 255, 150, 0.08);
+    border-color: rgba(100, 255, 150, 0.3);
+}
+
+.glass-input-green:focus {
+    border-color: rgba(100, 255, 150, 0.5);
+    box-shadow: 
+        inset 0 1px 0 rgba(100, 255, 150, 0.2),
+        0 12px 35px rgba(0, 0, 0, 0.2),
+        0 0 0 2px rgba(100, 255, 150, 0.2);
+}
+
+/* Input con icono */
+.glass-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.glass-input-icon {
+    position: absolute;
+    left: 18px;
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.glass-input-with-icon {
+    padding-left: 50px;
+}
+
+.glass-input-group:focus-within .glass-input-icon {
+    opacity: 0.9;
+    transform: scale(1.1);
+    transition: all 0.3s ease;
+}
+
+/* Fallback para navegadores sin soporte de backdrop-filter */
+@supports not (backdrop-filter: blur(1px)) {
+  .glass {
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  }
+  
+  .glass-subtle {
+    background: rgba(255, 255, 255, 0.6);
+  }
+  
+  .glass-strong {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
