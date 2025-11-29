@@ -34,3 +34,4 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/disponibilidad/{disponibilidad}', [DisponibilidadController::class, 'destroy'])->name('disponibilidad.destroy');
     Route::get('/disponibilidad/eventos', [DisponibilidadController::class, 'getEventos'])->name('disponibilidad.eventos');
 });
+

@@ -13,16 +13,16 @@
             {{-- Header --}}
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold text-foreground">Usuarios</h1>
-                    <p class="text-foreground-muted text-sm mt-1">Gestiona los usuarios del sistema</p>
+                    <h1 class="text-2xl font-bold text-foreground dark:text-foreground">Usuarios</h1>
+                    <p class="text-foreground-muted dark:text-foreground-muted text-sm mt-1">Gestiona los usuarios del sistema</p>
                 </div>
                 <div class="flex items-center gap-3">
-                    <span class="text-sm text-foreground-muted">{{ $usuarios->total() }} usuarios</span>
+                    <span class="text-sm text-foreground-muted dark:text-foreground-muted">{{ $usuarios->total() }} usuarios</span>
                 </div>
             </div>
 
             {{-- Filters --}}
-            <div class="bg-surface rounded-2xl p-4 mb-6 shadow-sm border border-border">
+            <div class="bg-surface dark:bg-surface rounded-2xl p-4 mb-6 shadow-sm border border-border dark:border-border transition-colors duration-300">
                 <form method="GET" id="user-filter-form" class="flex items-center gap-4 flex-wrap">
                     <div class="flex-1 min-w-[200px] relative">
                         <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -62,15 +62,15 @@
             {{-- Users Grid --}}
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @forelse($usuarios as $usuario)
-                <div class="bg-surface rounded-2xl p-5 shadow-sm border border-border hover:shadow-md hover:border-primary/30 transition-all group">
+                <div class="bg-surface dark:bg-surface rounded-2xl p-5 shadow-sm border border-border dark:border-border hover:shadow-md hover:border-primary/30 dark:hover:border-primary/30 transition-all group">
                     <div class="flex items-start justify-between mb-4">
                         <div class="flex items-center gap-3">
                             <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-lg shadow-primary/20">
                                 <span class="text-white font-bold text-lg">{{ strtoupper(substr($usuario->nombre, 0, 1)) }}</span>
                             </div>
                             <div>
-                                <h3 class="font-semibold text-foreground group-hover:text-primary transition-colors">{{ $usuario->nombre }}</h3>
-                                <p class="text-sm text-foreground-muted">{{ $usuario->email }}</p>
+                                <h3 class="font-semibold text-foreground dark:text-foreground group-hover:text-primary dark:group-hover:text-primary transition-colors">{{ $usuario->nombre }}</h3>
+                                <p class="text-sm text-foreground-muted dark:text-foreground-muted">{{ $usuario->email }}</p>
                             </div>
                         </div>
                         <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

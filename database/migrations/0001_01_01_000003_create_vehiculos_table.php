@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('foto', 400)->nullable();
             $table->year('anio')->nullable();
             $table->string('capacidad', 80)->nullable();
-            $table->enum('estado', ['disponible', 'asignado', 'mantenimiento', 'fuera_servicio'])->default('disponible');
+            $table->enum('estado', ['disponible', 'asignado', 'mantenimiento', 'inactivo'])->default('disponible');
             $table->text('observaciones')->nullable();
             $table->timestamps();
         });
