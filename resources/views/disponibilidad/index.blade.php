@@ -782,12 +782,15 @@
             cancelButtonText: 'Cancelar'
         }).then((result) => {
             if (result.isConfirmed) {
-                fetch(`/disponibilidad/${id}`, {
-                    method: 'DELETE',
+                fetch('{{ url("disponibilidad") }}/' + id, {
+                    method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    }
+                    },
+                    body: JSON.stringify({
+                        _method: 'DELETE'
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
@@ -800,6 +803,12 @@
                             showConfirmButton: false
                         }).then(() => {
                             window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: data.message || 'No se pudo eliminar la disponibilidad'
                         });
                     }
                 })
@@ -836,13 +845,13 @@
             },
             body: JSON.stringify(data)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status >= 200 && status < 300 && body.success) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Exito',
-                    text: data.message,
+                    text: body.message,
                     timer: 1500,
                     showConfirmButton: false
                 }).then(() => {
@@ -852,7 +861,7 @@
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
-                    text: data.message || 'Ocurrió un error al guardar'
+                    text: body.message || 'Ocurrió un error al guardar'
                 });
             }
         })
@@ -866,133 +875,6 @@
         });
     });
 
-    // Validar conflictos visualmente al seleccionar
-    function checkConflicts() {
-        // Reset visual states
-        document.querySelectorAll('.repartidor-chip').forEach(el => {
-            if (!el.classList.contains('selected')) {
-                el.style.opacity = '1';
-                el.title = '';
-            }
-        });
-        
-        document.querySelectorAll('.vehiculo-card').forEach(el => {
-            if (!el.classList.contains('selected')) {
-                el.classList.remove('in-use');
-                const badge = el.querySelector('.rounded-full.text-xs');
-                if (badge) {
-                     // Restaurar estado original basado en data-en-uso inicial (esto es simplificado, idealmente deberíamos recalcular todo)
-                     // Para simplificar, solo marcaremos conflictos con la selección actual
-                     if (el.dataset.enUso === 'false') {
-                         badge.className = 'px-2 py-1 text-xs rounded-full bg-success-light text-success';
-                         badge.textContent = 'Libre';
-                     }
-                }
-            }
-        });
-
-        if (diasSeleccionados.length === 0) return;
-
-        // Check repartidores conflicts
-        repartidoresSeleccionados.forEach(rep => {
-            const hasConflict = eventosData.some(evento => {
-                const eventoFecha = evento.fecha_inicio.split(' ')[0];
-                return diasSeleccionados.includes(eventoFecha) && evento.repartidor_id === rep.id;
-            });
-            
-            if (hasConflict) {
-                // Visual feedback for conflict? Maybe a warning icon or text
-            }
-        });
-
-        // Check vehicle conflicts
-        if (vehiculoSeleccionado) {
-             const hasConflict = eventosData.some(evento => {
-                const eventoFecha = evento.fecha_inicio.split(' ')[0];
-                return diasSeleccionados.includes(eventoFecha) && evento.vehiculo_id === vehiculoSeleccionado.id;
-            });
-            
-            if (hasConflict) {
-                 // Visual feedback
-            }
-        }
-        
-        // Update availability status for ALL items based on selected dates
-        updateAvailabilityStatus();
-    }
-
-    function updateAvailabilityStatus() {
-        if (diasSeleccionados.length === 0) return;
-
-        // Check all repartidores
-        document.querySelectorAll('.repartidor-chip').forEach(el => {
-            const id = parseInt(el.dataset.id);
-            const isBusy = eventosData.some(evento => {
-                const eventoFecha = evento.fecha_inicio.split(' ')[0];
-                return diasSeleccionados.includes(eventoFecha) && evento.repartidor_id === id;
-            });
-
-            if (isBusy) {
-                el.style.opacity = '0.5';
-                el.title = 'Ocupado en las fechas seleccionadas';
-                // Add visual indicator
-                if (!el.querySelector('.busy-indicator')) {
-                    const indicator = document.createElement('span');
-                    indicator.className = 'busy-indicator w-2 h-2 rounded-full bg-warning absolute -top-1 -right-1';
-                    el.style.position = 'relative';
-                    el.appendChild(indicator);
-                }
-            } else {
-                el.style.opacity = '1';
-                el.title = 'Disponible';
-                const indicator = el.querySelector('.busy-indicator');
-                if (indicator) indicator.remove();
-            }
-        });
-
-        // Check all vehicles
-        document.querySelectorAll('.vehiculo-card').forEach(el => {
-            const id = parseInt(el.dataset.id);
-            const isBusy = eventosData.some(evento => {
-                const eventoFecha = evento.fecha_inicio.split(' ')[0];
-                return diasSeleccionados.includes(eventoFecha) && evento.vehiculo_id === id;
-            });
-
-            const badge = el.querySelector('.rounded-full.text-xs');
-            if (isBusy) {
-                el.classList.add('in-use');
-                if (badge) {
-                    badge.className = 'px-2 py-1 text-xs rounded-full bg-warning-light text-warning';
-                    badge.textContent = 'Ocupado';
-                }
-            } else {
-                el.classList.remove('in-use');
-                if (badge) {
-                    badge.className = 'px-2 py-1 text-xs rounded-full bg-success-light text-success';
-                    badge.textContent = 'Disponible';
-                }
-            }
-        });
-    }
-
-    // Hook into selection changes
-    const originalToggleDia = toggleDia;
-    toggleDia = function(element, event) {
-        originalToggleDia(element, event);
-        checkConflicts();
-    };
-
-    const originalSeleccionarSemana = seleccionarSemana;
-    seleccionarSemana = function() {
-        originalSeleccionarSemana();
-        checkConflicts();
-    };
-
-    const originalLimpiarSeleccion = limpiarSeleccion;
-    limpiarSeleccion = function() {
-        originalLimpiarSeleccion();
-        checkConflicts();
-    };
 
 
     // Submit form editar
@@ -1001,6 +883,7 @@
         
         const id = document.getElementById('editar-id').value;
         const data = {
+            _method: 'PUT',
             vehiculo_id: document.getElementById('editar-vehiculo').value || null,
             fecha_inicio: document.getElementById('editar-fecha-inicio').value,
             fecha_fin: document.getElementById('editar-fecha-fin').value,
@@ -1008,25 +891,31 @@
             descripcion: document.getElementById('editar-descripcion').value
         };
         
-        fetch(`/disponibilidad/${id}`, {
-            method: 'PUT',
+        fetch('{{ url("disponibilidad") }}/' + id, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
             body: JSON.stringify(data)
         })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status >= 200 && status < 300 && body.success) {
                 Swal.fire({
                     icon: 'success',
                     title: 'Actualizado',
-                    text: data.message,
+                    text: body.message,
                     timer: 1500,
                     showConfirmButton: false
                 }).then(() => {
                     window.location.reload();
+                });
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: body.message || 'No se pudo actualizar la disponibilidad'
                 });
             }
         })
@@ -1208,6 +1097,25 @@
             }
         });
     }
+
+    // Hook into selection changes
+    const originalToggleDia = toggleDia;
+    toggleDia = function(element, event) {
+        originalToggleDia(element, event);
+        checkConflicts();
+    };
+
+    const originalSeleccionarSemana = seleccionarSemana;
+    seleccionarSemana = function() {
+        originalSeleccionarSemana();
+        checkConflicts();
+    };
+
+    const originalLimpiarSeleccion = limpiarSeleccion;
+    limpiarSeleccion = function() {
+        originalLimpiarSeleccion();
+        checkConflicts();
+    };
 
     // Logout confirmation
     function confirmLogout() {
