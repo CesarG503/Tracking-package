@@ -9,20 +9,15 @@
 
     <!-- Main Content -->
     <main class="flex-1 flex flex-col-reverse lg:flex-row overflow-hidden">
+
+        
         <!-- Left Panel - Package List -->
-        <div class="w-full lg:w-[420px] glass-sidebar border-r border-white/20 flex flex-col overflow-hidden h-auto lg:h-full">
-            <!-- Mobile Toggle Button -->
-            <button id="mobile-toggle" class="lg:hidden w-full p-3 flex items-center justify-center gap-2 border-b border-border dark:border-border bg-surface-secondary/50 dark:bg-surface-secondary/50 backdrop-blur-sm transition-colors duration-300">
-                <svg class="w-5 h-5 text-foreground dark:text-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                </svg>
-                <span class="text-sm font-medium text-foreground dark:text-foreground">Ver Envíos</span>
-            </button>
-            
-            <!-- Collapsible Content -->
-            <div id="mobile-content" class="flex flex-col overflow-hidden max-h-0 lg:max-h-full lg:flex-1 transition-none lg:transition-all duration-300">
+        <div id="shipment-panel" class="w-full lg:w-[420px] glass-sidebar border-r border-white/20 flex flex-col overflow-hidden h-[30vh] max-h-[30vh] lg:h-full lg:max-h-full transition-all duration-300 ease-out">
+            <button id="toggle-shipments" class="lg:hidden w-full flex items-center justify-center b active:scale-95">`
+                <div class="w-12 h-1 bg-foreground-muted/40 rounded-full"></div>
+            </button>    
             <!-- Header -->
-            <div class="p-4 lg:p-6 border-b border-border dark:border-border transition-colors duration-300">
+            <div class="px-4 lg:px-6 pb-3 border-b border-border dark:border-border transition-colors duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <h1 class="text-xl font-bold text-foreground dark:text-foreground">Seguimiento de Envios</h1>
                     <button class="w-10 h-10 rounded-xl bg-surface-secondary dark:bg-surface-secondary flex items-center justify-center text-foreground-muted dark:text-foreground-muted hover:bg-border dark:hover:bg-border transition-colors">
@@ -227,13 +222,12 @@
                 @endforelse
                     </div>
             </div>
-            </div>
         </div>
 
         <!-- Right Panel - Map & Details -->
-        <div class="flex-1 flex flex-col p-3 lg:p-6 overflow-hidden">
+        <div class="flex-1 flex flex-col p-3 overflow-hidden">
             <!-- Map Container with Overlay Details -->
-            <div class="map-container rounded-2xl lg:rounded-3xl relative overflow-hidden shadow-lg lg:h-[100vh] min-h-[400px]  lg:min-h-[600px]">
+            <div class="map-container rounded-2xl lg:rounded-3xl relative overflow-hidden shadow-lg lg:h-[100vh] min-h-[70vh]  lg:min-h-[60vh]">
                 <div id="map" class="w-full h-full rounded-2xl lg:rounded-3xl"></div>
                 
                 <!-- Map Controls -->
@@ -425,40 +419,7 @@ function confirmLogout() {
     });
 }
 
-// Mobile toggle for shipment list
-document.addEventListener('DOMContentLoaded', () => {
-    const toggleBtn = document.getElementById('mobile-toggle');
-    const mobileContent = document.getElementById('mobile-content');
-    let isExpanded = false;
 
-    if (toggleBtn && mobileContent) {
-        toggleBtn.addEventListener('click', () => {
-            // Solo funciona en móvil (pantallas menores a 1024px)
-            if (window.innerWidth >= 1024) return;
-            
-            isExpanded = !isExpanded;
-            
-            if (isExpanded) {
-                mobileContent.style.maxHeight = '60vh';
-                toggleBtn.querySelector('svg').style.transform = 'rotate(180deg)';
-                toggleBtn.querySelector('span').textContent = 'Ocultar Envíos';
-            } else {
-                mobileContent.style.maxHeight = '0';
-                toggleBtn.querySelector('svg').style.transform = 'rotate(0deg)';
-                toggleBtn.querySelector('span').textContent = 'Ver Envíos';
-            }
-        });
-        
-        // Resetear estilos inline cuando se redimensiona a desktop
-        window.addEventListener('resize', () => {
-            if (window.innerWidth >= 1024) {
-                mobileContent.style.maxHeight = '';
-                toggleBtn.querySelector('svg').style.transform = '';
-                isExpanded = false;
-            }
-        });
-    }
-});
 </script>
 
 <script>
@@ -591,5 +552,35 @@ document.addEventListener('DOMContentLoaded', () => {
     tabEnRutas?.addEventListener('click', () => setActiveTab('en_ruta'));
     tabSinAsignar?.addEventListener('click', () => setActiveTab('pendiente'));
     tabEntregados?.addEventListener('click', () => setActiveTab('entregado'));
+    
+    // Toggle Shipment Panel Height (Mobile Only)
+    const toggleBtn = document.getElementById('toggle-shipments');
+    const shipmentPanel = document.getElementById('shipment-panel');
+    let isExpanded = false;
+    
+    if (toggleBtn && shipmentPanel && window.innerWidth < 1024) {
+        toggleBtn.addEventListener('click', () => {
+            if (window.innerWidth >= 1024) return; // Solo en móvil
+            
+            isExpanded = !isExpanded;
+            
+            if (isExpanded) {
+                shipmentPanel.style.height = '70vh';
+                shipmentPanel.style.maxHeight = '70vh';
+            } else {
+                shipmentPanel.style.height = '30vh';
+                shipmentPanel.style.maxHeight = '30vh';
+            }
+        });
+        
+        // Reset en resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024) {
+                isExpanded = false;
+                shipmentPanel.style.height = '';
+                shipmentPanel.style.maxHeight = '';
+            }
+        });
+    }
 });
 </script>
