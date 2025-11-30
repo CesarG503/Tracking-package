@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Disponibilidad;
 use App\Models\User;
 use App\Models\Vehiculo;
 use App\Models\VehiculoAsignacion;
@@ -105,6 +106,24 @@ class DatabaseSeeder extends Seeder
             'estado' => 'activo',
         ]);
 
+        Disponibilidad::create([
+            "vehiculo_id" => $vehiculo1->id,
+            "repartidor_id" => $repartidor1->id,
+            "fecha_inicio" => now(),
+            "fecha_fin" => now()->addHours(5),
+            "tipo" => "disponible",
+            "descripcion" => "Disponibilidad para entregas matutinas",
+        ]);
+
+        Disponibilidad::create([
+            "vehiculo_id" => $vehiculo2->id,
+            "repartidor_id" => $repartidor2->id,
+            "fecha_inicio" => now(),
+            "fecha_fin" => now()->addHours(3),
+            "tipo" => "disponible",
+            "descripcion" => "Disponibilidad para entregas matutinas",
+        ]);
+
         // Create Shipments
         Envio::create([
             'codigo' => 'ENV-CZ4YBHLS',
@@ -156,7 +175,6 @@ class DatabaseSeeder extends Seeder
             'tipo_envio' => 'Standard Internacional',
             'fecha_estimada' => now()->addDays(7),
             'estado' => 'en_ruta',
-            'repartidor_id' => $repartidor2->id,
         ]);
 
         Envio::create([
