@@ -235,6 +235,15 @@ class DisponibilidadController extends Controller
                 ], 422);
             }
         }
+        
+        VehiculoAsignacion::where('repartidor_id', $disponibilidad->repartidor_id)
+            ->where('fecha_inicio', $disponibilidad->fecha_inicio)
+            ->where('fecha_fin', $disponibilidad->fecha_fin)
+            ->update([
+                'vehiculo_id' => $request->vehiculo_id,
+                'fecha_inicio' => $request->fecha_inicio,
+                'fecha_fin' => $request->fecha_fin,
+            ]);
 
         $disponibilidad->update([
             'vehiculo_id' => $request->vehiculo_id,
@@ -243,16 +252,6 @@ class DisponibilidadController extends Controller
             'tipo' => $request->tipo,
             'descripcion' => $request->descripcion,
         ]);
-
-        VehiculoAsignacion::where('vehiculo_id', $disponibilidad->vehiculo_id)
-            ->where('repartidor_id', $disponibilidad->repartidor_id)
-            ->where('fecha_inicio', $disponibilidad->fecha_inicio)
-            ->where('fecha_fin', $disponibilidad->fecha_fin)
-            ->update([
-                'vehiculo_id' => $request->vehiculo_id,
-                'fecha_inicio' => $request->inicio,
-                'fecha_fin' => $request->fin,
-            ]);
 
         return response()->json([
             'success' => true,

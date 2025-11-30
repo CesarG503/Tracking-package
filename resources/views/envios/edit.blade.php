@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Editar Envío #' . $envio->numero_seguimiento)
+@section('title', 'Editar Envío #' . $envio->codigo)
 
 @section('content')
 <div class="flex h-screen overflow-hidden">
@@ -13,7 +13,7 @@
             {{-- Header --}}
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h1 class="text-2xl font-bold text-foreground">Editar Envío #{{ $envio->numero_seguimiento }}</h1>
+                    <h1 class="text-2xl font-bold text-foreground">Editar Envío #{{ $envio->codigo }}</h1>
                     <p class="text-foreground-muted text-sm mt-1">Modifica los detalles del envío</p>
                 </div>
                 <div class="flex items-center gap-2">
@@ -50,11 +50,12 @@
                         <div>
                             <label class="block text-sm font-medium text-foreground mb-2">Número de Seguimiento *</label>
                             <input type="text" 
-                                   name="numero_seguimiento" 
-                                   value="{{ old('numero_seguimiento', $envio->numero_seguimiento) }}"
-                                   class="w-full px-4 py-3 bg-surface-secondary border border-border rounded-xl text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all @error('numero_seguimiento') border-danger @enderror" 
+                                   name="codigo" 
+                                   value="{{ old('codigo', $envio->codigo) }}"
+                                   class="w-full px-4 py-3 bg-surface-secondary border border-border rounded-xl text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all @error('codigo') border-danger @enderror" 
+                                   disabled
                                    required>
-                            @error('numero_seguimiento')
+                            @error('codigo')
                                 <p class="text-danger text-sm mt-1">{{ $message }}</p>
                             @enderror
                         </div>
@@ -220,13 +221,44 @@
                         </svg>
                         Programación y Asignación
                     </h2>
+                    
+                    {{-- Información de Asignación Actual --}}
+                    <div class="bg-gradient-to-r from-primary/5 to-info/5 border border-primary/10 rounded-xl p-4 mb-6">
+                        <h3 class="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            Asignación Actual
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                            <div>
+                                <span class="text-foreground-muted">Fecha Estimada:</span>
+                                <p class="font-medium text-foreground">{{ $envio->fecha_estimada ? $envio->fecha_estimada->format('d/m/Y') : 'No definida' }}</p>
+                            </div>
+                            <div>
+                                <span class="text-foreground-muted">Repartidor:</span>
+                                <p class="font-medium text-foreground">{{ $envio->repartidor ? $envio->repartidor->nombre : 'Sin asignar' }}</p>
+                            </div>
+                            <div>
+                                <span class="text-foreground-muted">Vehículo:</span>
+                                <p class="font-medium text-foreground">
+                                    @if($envio->vehiculoAsignacion?->vehiculo)
+                                        {{ $envio->vehiculoAsignacion->vehiculo->marca }} {{ $envio->vehiculoAsignacion->vehiculo->modelo }} ({{ $envio->vehiculoAsignacion->vehiculo->placa }})
+                                    @else
+                                        Sin asignar
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-foreground mb-2">Fecha Estimada de Entrega *</label>
                             <input type="date" 
                                    name="fecha_estimada" 
                                    id="fecha_estimada" 
-                                   value="{{ old('fecha_estimada', $envio->fecha_estimada_entrega ? $envio->fecha_estimada_entrega->format('Y-m-d') : '') }}"
+                                   value="{{ old('fecha_estimada', $envio->fecha_estimada ? $envio->fecha_estimada->format('Y-m-d') : '') }}"
                                    class="w-full px-4 py-3 bg-surface-secondary border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer @error('fecha_estimada') border-danger @enderror" 
                                    min="{{ date('Y-m-d') }}" 
                                    required>
@@ -235,14 +267,10 @@
                             @enderror
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-foreground mb-2">Fecha Real de Entrega</label>
-                            <input type="date" 
-                                   name="fecha_entrega_real" 
-                                   value="{{ old('fecha_entrega_real', $envio->fecha_entrega_real ? $envio->fecha_entrega_real->format('Y-m-d') : '') }}"
-                                   class="w-full px-4 py-3 bg-surface-secondary border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer @error('fecha_entrega_real') border-danger @enderror">
-                            @error('fecha_entrega_real')
-                                <p class="text-danger text-sm mt-1">{{ $message }}</p>
-                            @enderror
+                            <label class="block text-sm font-medium text-foreground mb-2">Hora para Disponibilidad</label>
+                            <input type="time" id="hora_disponibilidad" value="08:00" 
+                                class="w-full px-4 py-3 bg-surface-secondary border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer">
+                            <small class="text-foreground-muted text-xs">Solo para verificar disponibilidad de recursos</small>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-foreground mb-2">Repartidor y Vehículo</label>
@@ -394,9 +422,10 @@ document.getElementById('imageModal').addEventListener('click', function(e) {
     }
 });
 
-// Función para cargar recursos disponibles basado en fecha
+// Función para cargar recursos disponibles basado en fecha y hora
 async function cargarRecursosDisponibles() {
     const fecha = document.getElementById('fecha_estimada').value;
+    const hora = document.getElementById('hora_disponibilidad').value || '08:00';
     const vehiculoSelect = document.getElementById('vehiculo_asignacion_id');
     const loadingDiv = document.getElementById('loading-resources');
     const noResourcesDiv = document.getElementById('no-resources');
@@ -417,7 +446,7 @@ async function cargarRecursosDisponibles() {
     }
     
     try {
-        const response = await fetch(`{{ route('envios.available-resources') }}?fecha=${fecha}&hora=08:00`, {
+        const response = await fetch(`{{ route('envios.available-resources') }}?fecha=${fecha}&hora=${hora}`, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
@@ -449,7 +478,7 @@ async function cargarRecursosDisponibles() {
             infoDiv.classList.add('bg-success/10', 'border-success/20');
             infoDiv.innerHTML = `
                 <p class="text-success text-sm">
-                    <strong>${data.recursos.length} recurso(s) disponible(s)</strong> encontrado(s) para el ${new Date(new Date(fecha).getTime() + (24 * 60 * 60 * 1000)).toLocaleDateString()}.
+                    <strong>${data.recursos.length} recurso(s) disponible(s)</strong> encontrado(s) para el ${new Date(new Date(fecha).getTime() + (24 * 60 * 60 * 1000)).toLocaleDateString()} a las ${hora}.
                 </p>
             `;
             infoDiv.classList.remove('hidden');
@@ -472,8 +501,9 @@ async function cargarRecursosDisponibles() {
     }
 }
 
-// Event listeners para fecha
+// Event listeners para fecha y hora
 document.getElementById('fecha_estimada').addEventListener('change', cargarRecursosDisponibles);
+document.getElementById('hora_disponibilidad').addEventListener('change', cargarRecursosDisponibles);
 
 // Trigger initial load
 document.addEventListener('DOMContentLoaded', function() {

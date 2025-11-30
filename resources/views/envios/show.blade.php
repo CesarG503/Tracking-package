@@ -179,29 +179,41 @@
                     @if($envio->repartidor)
                     <div>
                         <label class="block text-sm font-medium text-foreground-muted mb-1">Repartidor Asignado</label>
-                        <div class="flex items-center gap-3 p-3 bg-surface-secondary rounded-xl">
-                            <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
-                                <span class="text-white font-semibold text-sm">
-                                    {{ strtoupper(substr($envio->repartidor->nombre, 0, 2)) }}
-                                </span>
+                        <a href="{{ route('usuarios.show', $envio->repartidor) }}" class="block">
+                            <div class="flex items-center gap-3 p-3 bg-surface-secondary rounded-xl hover:bg-border transition-colors cursor-pointer group">
+                                <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center group-hover:bg-primary-hover transition-colors">
+                                    <span class="text-white font-semibold text-sm">
+                                        {{ strtoupper(substr($envio->repartidor->nombre, 0, 2)) }}
+                                    </span>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-foreground font-medium group-hover:text-primary transition-colors">{{ $envio->repartidor->nombre }}</p>
+                                    @if($envio->repartidor->email)
+                                    <p class="text-foreground-muted text-sm">{{ $envio->repartidor->email }}</p>
+                                    @endif
+                                </div>
+                                <svg class="w-4 h-4 text-foreground-muted group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
                             </div>
-                            <div>
-                                <p class="text-foreground font-medium">{{ $envio->repartidor->nombre }}</p>
-                                @if($envio->repartidor->email)
-                                <p class="text-foreground-muted text-sm">{{ $envio->repartidor->email }}</p>
-                                @endif
-                            </div>
-                        </div>
+                        </a>
                     </div>
                     @endif
                     
                     @if($envio->vehiculoAsignacion?->vehiculo)
                     <div>
                         <label class="block text-sm font-medium text-foreground-muted mb-1">Vehículo Asignado</label>
-                        <div class="p-3 bg-surface-secondary rounded-xl">
-                            <p class="text-foreground font-medium">{{ $envio->vehiculoAsignacion->vehiculo->marca }} {{ $envio->vehiculoAsignacion->vehiculo->modelo }}</p>
-                            <p class="text-foreground-muted text-sm">Placa: {{ $envio->vehiculoAsignacion->vehiculo->placa }}</p>
-                        </div>
+                        <a href="{{ route('vehiculos.show', $envio->vehiculoAsignacion->vehiculo) }}" class="block">
+                            <div class="p-3 bg-surface-secondary rounded-xl hover:bg-border transition-colors cursor-pointer group flex items-center justify-between">
+                                <div>
+                                    <p class="text-foreground font-medium group-hover:text-primary transition-colors">{{ $envio->vehiculoAsignacion->vehiculo->marca }} {{ $envio->vehiculoAsignacion->vehiculo->modelo }}</p>
+                                    <p class="text-foreground-muted text-sm">Placa: {{ $envio->vehiculoAsignacion->vehiculo->placa }}</p>
+                                </div>
+                                <svg class="w-4 h-4 text-foreground-muted group-hover:text-primary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </div>
+                        </a>
                     </div>
                     @endif
                 </div>
