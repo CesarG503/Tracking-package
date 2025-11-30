@@ -132,6 +132,11 @@
   --glass-border-color: rgba(59, 130, 246, 0.4);
 }
 
+.glass-primary {
+  --glass-bg-color: rgba(30, 136, 255, 0.50);
+  --glass-border-color: rgba(30, 136, 255, 0.75);
+}
+
 .glass-green {
   --glass-bg-color: rgba(34, 197, 94, 0.3);
   --glass-border-color: rgba(34, 197, 94, 0.4);
@@ -161,6 +166,12 @@
   --glass-bg-color: rgba(0, 0, 0, 0.3);
   --glass-border-color: rgba(255, 255, 255, 0.2);
   color: white;
+}
+
+.glass-gray {
+  --glass-bg-color: rgba(164, 164, 164, 0.3);
+  --glass-border-color: rgba(84, 84, 84, 0.2);
+  color: rgb(135, 135, 135);
 }
 
 /* Efectos especiales */
@@ -293,6 +304,17 @@
 
 .glass-advanced.with-hover-effects:active {
   transform: translateY(0px) scale(0.98);
+}
+
+/* Variante estática sin interactividad */
+.glass-static:hover,
+.glass-static:active {
+  background: var(--glass-bg-color) !important;
+  transform: none !important;
+  box-shadow: 
+    1px 1px 1px 0px rgba(255,255,255, 0.60) inset, 
+    -1px -1px 1px 0px rgba(255,255,255, 0.60) inset, 
+    0px 0px 16px 0px var(--glass-shadow-color) !important;
 }
 
 /* ========== NAVEGACIÓN LIQUID GLASS ========== */
