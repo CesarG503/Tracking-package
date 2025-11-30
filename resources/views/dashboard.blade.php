@@ -52,22 +52,22 @@
                     <!-- Lista En Ruta -->
                     <div id="lista-en-ruta" class="space-y-3 hidden">
                 @forelse($enviosEnRuta as $envio)
-                <div class="glass-card dark:glass-card-dark rounded-2xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 {{ $loop->first ? 'glass-card-active dark:glass-card-active-dark text-white' : '' }} envio-card" data-target="details-envio-{{ $envio->id }}">
+                <div class="glass-card dark:glass-card-dark rounded-2xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 envio-card" data-target="details-envio-{{ $envio->id }}">
                     <div class="flex items-center justify-between mb-3">
                         <div>
-                            <h3 class="font-semibold {{ $loop->first ? 'text-white' : 'text-foreground dark:text-foreground' }}">
+                            <h3 class="font-semibold text-foreground dark:text-foreground">
                                 {{ Str::limit($envio->remitente_direccion, 15) }} → {{ Str::limit($envio->destinatario_direccion, 15) }}
                             </h3>
-                            <p class="text-sm {{ $loop->first ? 'text-blue-100' : 'text-foreground-muted dark:text-foreground-muted' }}">
+                            <p class="text-sm text-foreground-muted dark:text-foreground-muted">
                                 Order ID #{{ str_pad($envio->id, 5, '0', STR_PAD_LEFT) }}-{{ rand(10000,99999) }}
                             </p>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="status-badge px-3 py-1 rounded-full text-xs font-medium {{ $loop->first ? 'bg-white/20 text-white' : 'bg-warning-light dark:bg-warning-light text-warning dark:text-warning' }}">
+                            <span class="status-badge px-3 py-1 rounded-full text-xs font-medium bg-warning-light dark:bg-warning-light text-warning dark:text-warning">
                                 En Ruta
                             </span>
                             @if(!$envio->repartidor)
-                                <span class="px-2 py-0.5 rounded-full text-[10px] font-medium {{ $loop->first ? 'bg-white/20 text-white' : 'bg-surface-secondary text-foreground-muted' }}">
+                                <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-surface-secondary text-foreground-muted">
                                     Sin asignar
                                 </span>
                             @endif
@@ -80,20 +80,20 @@
                                 <img src="/placeholder.svg?height=40&width=40" alt="Courier" class="w-full h-full object-cover">
                             </div>
                             <div class="flex-1">
-                                <p class="font-medium {{ $loop->first ? 'text-white' : 'text-foreground' }}">{{ $envio->repartidor->nombre }}</p>
-                                <p class="text-sm {{ $loop->first ? 'text-blue-100' : 'text-foreground-muted' }}">Repartidor</p>
+                                <p class="font-medium text-foreground">{{ $envio->repartidor->nombre }}</p>
+                                <p class="text-sm text-foreground-muted">Repartidor</p>
                             </div>
                         </div>
                         @else
                         <div class="flex items-center gap-3 mb-3">
                             <div class="w-10 h-10 rounded-full bg-surface-secondary flex items-center justify-center">
-                                <svg class="w-6 h-6 {{ $loop->first ? 'text-white' : 'text-foreground-muted' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg class="w-6 h-6 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                             </div>
                             <div class="flex-1">
-                                <p class="font-medium {{ $loop->first ? 'text-white' : 'text-foreground' }}">Sin asignar</p>
-                                <p class="text-sm {{ $loop->first ? 'text-blue-100' : 'text-foreground-muted' }}">Repartidor</p>
+                                <p class="font-medium text-foreground">Sin asignar</p>
+                                <p class="text-sm text-foreground-muted">Repartidor</p>
                             </div>
                         </div>
                         @endif
@@ -106,7 +106,7 @@
                     @endphp
                     <button
                         type="button"
-                        class="toggle-details w-full py-2.5 {{ $loop->first ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-surface-secondary hover:bg-foreground-muted/35 text-foreground' }} rounded-xl text-sm font-medium transition-colors"
+                        class="toggle-details w-full py-2.5 bg-primary text-white hover:bg-primary-hover rounded-xl text-sm font-medium transition-colors"
                         data-target="details-envio-{{ $envio->id }}"
                         data-lat="{{ $latReal }}"
                         data-lng="{{ $lngReal }}"
@@ -231,55 +231,52 @@
         </div>
 
         <!-- Right Panel - Map & Details -->
-        <div class="flex-1 flex flex-col p-3 lg:p-6 gap-4 overflow-hidden">
-            <!-- Map -->
-            <div class="map-container rounded-2xl lg:rounded-3xl relative overflow-hidden shadow-lg flex-1 min-h-[400px] lg:min-h-[600px]">
+        <div class="flex-1 flex flex-col p-3 lg:p-6 overflow-hidden">
+            <!-- Map Container with Overlay Details -->
+            <div class="map-container rounded-2xl lg:rounded-3xl relative overflow-hidden shadow-lg lg:h-[100vh] min-h-[400px]  lg:min-h-[600px]">
                 <div id="map" class="w-full h-full rounded-2xl lg:rounded-3xl"></div>
                 
+                <!-- Map Controls -->
                 <div class="absolute top-3 right-3 lg:top-4 lg:right-4 flex gap-2 z-[1000]">
-                    <button onclick="centerMap()" class="w-10 h-10 glass rounded-xl flex items-center justify-center text-foreground hover:bg-surface transition-colors shadow-lg">
+                    <button onclick="centerMap()" class="w-10 h-10 glass-advanced rounded-xl flex items-center justify-center text-foreground hover:bg-surface transition-colors shadow-lg">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                     </button>
                 </div>
-            </div>
-
-            <!-- Order Details Card -->
-            <div class="hidden lg:block glass-card rounded-2xl p-5">
+                
+                <!-- Order Details Card - Overlay at Bottom -->
                 @if($enviosEnRuta->first())
                 @php $envio = $enviosEnRuta->first(); @endphp
-                <div class="flex items-start justify-between">
-                    <div class="flex-1">
-                        <div class="flex items-center gap-3 mb-4">
-                            <h2 class="text-lg font-bold text-foreground">Order ID #{{ str_pad($envio->id, 5, '0', STR_PAD_LEFT) }}</h2>
-                            <span class="px-3 py-1 rounded-full text-xs font-medium bg-warning-light text-warning">En Ruta</span>
-                        </div>
-                        
-                        <div class="grid grid-cols-4 gap-4">
-                            <div>
-                                <p class="text-xs text-foreground-muted mb-1">Origen</p>
-                                <p class="text-sm font-medium text-foreground">{{ Str::limit($envio->remitente_direccion, 20) }}</p>
+                <div class="bottom-3 left-3 right-3 lg:bottom-4 glass lg:left-4 lg:right-4  rounded-2xl p-4 lg:p-5 z-[999] max-w-full  rounded-xl  text-foreground transition-colors shadow-lg !absolute glass-card  dark:glass-card-dark">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 lg:gap-3 mb-3 lg:mb-4 flex-wrap">
+                                <h2 class="text-base lg:text-lg font-bold text-foreground truncate">Order ID #{{ str_pad($envio->id, 5, '0', STR_PAD_LEFT) }}</h2>
+                                <span class="px-3 py-1 rounded-full text-xs font-medium bg-warning-light text-warning whitespace-nowrap">En Ruta</span>
                             </div>
-                            <div>
-                                <p class="text-xs text-foreground-muted mb-1">Destino</p>
-                                <p class="text-sm font-medium text-foreground">{{ Str::limit($envio->destinatario_direccion, 20) }}</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-foreground-muted mb-1">Estado</p>
-                                <p class="text-sm font-medium text-foreground">En Transito</p>
-                            </div>
-                            <div>
-                                <p class="text-xs text-foreground-muted mb-1">Fecha Estimada</p>
-                                <p class="text-sm font-medium text-foreground">{{ $envio->fecha_estimada ? $envio->fecha_estimada->format('d/m/Y') : 'Por definir' }}</p>
+                            
+                            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4">
+                                <div class="min-w-0">
+                                    <p class="text-xs text-foreground-muted mb-1">Origen</p>
+                                    <p class="text-sm font-medium text-foreground truncate" title="{{ $envio->remitente_direccion }}">{{ Str::limit($envio->remitente_direccion, 20) }}</p>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs text-foreground-muted mb-1">Destino</p>
+                                    <p class="text-sm font-medium text-foreground truncate" title="{{ $envio->destinatario_direccion }}">{{ Str::limit($envio->destinatario_direccion, 20) }}</p>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs text-foreground-muted mb-1">Estado</p>
+                                    <p class="text-sm font-medium text-foreground">En Transito</p>
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs text-foreground-muted mb-1">Fecha Estimada</p>
+                                    <p class="text-sm font-medium text-foreground">{{ $envio->fecha_estimada ? $envio->fecha_estimada->format('d/m/Y') : 'Por definir' }}</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                @else
-                <div class="text-center py-8">
-                    <p class="text-foreground-muted">Selecciona un envio para ver los detalles</p>
                 </div>
                 @endif
             </div>
@@ -302,11 +299,11 @@ let currentTileLayer = null;
 const mapLayers = {
     light: {
         url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+
     },
     dark: {
         url: 'https://tiles.stadiamaps.com/tiles/stamen_toner_dark/{z}/{x}/{y}{r}.png',
-        attribution: '&copy; <a href="https://stamen.com">Stamen Design</a> &copy; <a href="https://www.stadiamaps.com">Stadia Maps</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+
     }
 };
 
