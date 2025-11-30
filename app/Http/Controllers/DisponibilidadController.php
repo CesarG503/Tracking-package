@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Disponibilidad;
+use App\Models\VehiculoAsignacion;
 use App\Models\User;
 use App\Models\Vehiculo;
 use Illuminate\Http\Request;
@@ -158,6 +159,14 @@ class DisponibilidadController extends Controller
                     'tipo' => $request->tipo,
                     'descripcion' => $request->descripcion,
                 ]);
+
+                VehiculoAsignacion::create([
+                    'vehiculo_id' => $request->vehiculo_id,
+                    'repartidor_id' => $repartidorId,
+                    'fecha_inicio' => $inicio,
+                    'fecha_fin' => $fin,
+                    'estado' => 'activo',
+                ]);
                 
                 $creados[] = $disponibilidad->id;
             }
@@ -235,6 +244,16 @@ class DisponibilidadController extends Controller
             'descripcion' => $request->descripcion,
         ]);
 
+        VehiculoAsignacion::where('vehiculo_id', $disponibilidad->vehiculo_id)
+            ->where('repartidor_id', $disponibilidad->repartidor_id)
+            ->where('fecha_inicio', $disponibilidad->fecha_inicio)
+            ->where('fecha_fin', $disponibilidad->fecha_fin)
+            ->update([
+                'vehiculo_id' => $request->vehiculo_id,
+                'fecha_inicio' => $request->inicio,
+                'fecha_fin' => $request->fin,
+            ]);
+
         return response()->json([
             'success' => true,
             'message' => 'Disponibilidad actualizada exitosamente'
@@ -244,6 +263,11 @@ class DisponibilidadController extends Controller
     public function destroy(Disponibilidad $disponibilidad)
     {
         $disponibilidad->delete();
+        VehiculoAsignacion::where('vehiculo_id', $disponibilidad->vehiculo_id)
+            ->where('repartidor_id', $disponibilidad->repartidor_id)
+            ->where('fecha_inicio', $disponibilidad->fecha_inicio)
+            ->where('fecha_fin', $disponibilidad->fecha_fin)
+            ->delete();
 
         return response()->json([
             'success' => true,
