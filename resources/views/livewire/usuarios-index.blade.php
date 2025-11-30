@@ -47,7 +47,7 @@
         <div class="bg-surface dark:bg-surface rounded-2xl p-5 shadow-sm border border-border dark:border-border hover:shadow-md hover:border-primary/30 dark:hover:border-primary/30 transition-all group">
             <div class="flex items-start justify-between mb-4">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-lg shadow-primary/20">
+                    <div class="glass glass-primary glass-static w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-primary-hover flex items-center justify-center shadow-lg shadow-primary/20">
                         <span class="text-white font-bold text-lg">{{ strtoupper(substr($usuario->nombre, 0, 1)) }}</span>
                     </div>
                     <div>
@@ -85,14 +85,14 @@
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-foreground-muted">Rol</span>
                     @if($usuario->rol === 'admin')
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-purple-100 text-purple-700">
+                    <span class="glass glass-static glass-strong glass-purple inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-purple-700">
                         <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
                         </svg>
                         Admin
                     </span>
                     @else
-                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-100 text-cyan-700">
+                    <span class="glass glass-static glass-strong glass-blue inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium bg-cyan-100 text-cyan-700">
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                         </svg>
@@ -108,19 +108,26 @@
 
                 <div class="flex items-center justify-between text-sm">
                     <span class="text-foreground-muted">Licencia</span>
-                    <span class="font-mono text-foreground text-xs bg-surface-secondary px-2 py-0.5 rounded">{{ $usuario->licencia ?? '-' }}</span>
+                    <span class="glass glass-static glass-strong glass-gray font-mono text-foreground text-xs bg-surface-secondary px-2 py-0.5 rounded">{{ $usuario->licencia ?? '-' }}</span>
                 </div>
 
                 <div class="flex items-center justify-between text-sm pt-2 border-t border-border">
                     <span class="text-foreground-muted">Estado</span>
-                    <form action="{{ route('usuarios.toggle-active', $usuario) }}" method="POST" class="inline">
-                        @csrf
-                        @method('PATCH')
-                        <button type="submit" class="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg text-xs font-medium transition-colors {{ $usuario->activo ? 'bg-success-light text-success hover:bg-success/20' : 'bg-surface-secondary text-foreground-muted hover:bg-border' }}">
-                            <span class="w-1.5 h-1.5 rounded-full {{ $usuario->activo ? 'bg-success' : 'bg-danger' }}"></span>
-                            {{ $usuario->activo ? 'Activo' : 'Inactivo' }}
-                        </button>
-                    </form>
+                        <form action="{{ route('usuarios.toggle-active', $usuario) }}" method="POST" class="inline">
+                            @csrf                                                                                                                                      
+                            @method('PATCH')
+                            <button type="submit" class="glass glass-subtle glass-pill inline-flex items-center px-2.5 py-1 gap-1 text-xs font-medium {{ $usuario->activo ? 'glass-green hover:glass-green text-success' : 'glass-red hover:glass-red text-foreground-muted' }}">
+                                <span class="relative flex h-2 w-2">
+                                    @if($usuario->activo)
+                                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75"></span>
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-success"></span>
+                                    @else
+                                        <span class="relative inline-flex rounded-full h-2 w-2 bg-danger"></span>
+                                    @endif
+                                </span>
+                                {{ $usuario->activo ? 'Activo' : 'Inactivo' }}
+                            </button>
+                        </form>
                 </div>
             </div>
 
