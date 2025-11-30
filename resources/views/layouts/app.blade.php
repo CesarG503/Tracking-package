@@ -48,6 +48,7 @@
     </script>
 
     @stack('styles')
+    @livewireStyles
 </head>
 <body class="font-sans antialiased bg-background from-blue-50 via-sky-50 to-cyan-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 min-h-screen transition-colors duration-300">
     @yield('content')
@@ -94,5 +95,7 @@
     @endif
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+    <script src="vendor/livewire/livewire.js" data-csrf="{{ csrf_token() }}" data-update-uri="{{ route('livewire.update') }}" data-navigate-once="true"></script>
 </body>
 </html>

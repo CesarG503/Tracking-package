@@ -56,7 +56,7 @@
                             {{-- Imagen Principal --}}
                             <div class="relative aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5 mb-4">
                                 <img id="main-image" 
-                                     src="{{ Storage::url($fotos[0]) }}" 
+                                     src="{{ asset('storage/' . $fotos[0]) }}" 
                                      alt="{{ $vehiculo->marca }} {{ $vehiculo->modelo }}" 
                                      class="w-full h-full object-cover transition-opacity duration-300">
                                 <div class="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white px-3 py-1.5 rounded-lg text-xs font-medium">
@@ -69,10 +69,10 @@
                             <div class="grid grid-cols-4 gap-3">
                                 @foreach($fotos as $index => $foto)
                                 <button type="button" 
-                                        onclick="changeMainImage('{{ Storage::url($foto) }}', {{ $index + 1 }})"
+                                        onclick="changeMainImage('{{ asset('storage/' . $foto) }}', {{ $index + 1 }})"
                                         class="aspect-video rounded-lg overflow-hidden border-2 transition-all hover:border-primary focus:border-primary focus:outline-none thumbnail-btn {{ $index === 0 ? 'border-primary' : 'border-border' }}"
                                         data-index="{{ $index }}">
-                                    <img src="{{ Storage::url($foto) }}" 
+                                    <img src="{{ asset('storage/' . $foto) }}" 
                                          alt="Foto {{ $index + 1 }}" 
                                          class="w-full h-full object-cover">
                                 </button>
