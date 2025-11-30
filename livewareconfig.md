@@ -62,6 +62,17 @@ public function render()
 </div>
 @endsection
 ```
+# Logica de clase Livewire
+
+```php
+public function render()
+{
+    return view('livewire.ejemplo')
+        ->extends('layouts.app')  // El layout base
+        ->section('content');     // La sección donde va el contenido (@yield('content'))
+}
+```
+
 
 ## 3. Comandos de artisan dentro del contenedor Docker
 
