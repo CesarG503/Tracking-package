@@ -73,8 +73,8 @@
                 </div>
 
                 @php
-                    $latReal = $envio->lng;
-                    $lngReal = $envio->lat;
+                    $latReal = $envio->lat;
+                    $lngReal = $envio->lng;
                 @endphp
                 <button
                     type="button"

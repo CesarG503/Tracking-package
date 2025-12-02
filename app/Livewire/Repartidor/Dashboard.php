@@ -8,6 +8,12 @@ use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends Component
 {
+    #[Computed]
+    public $empresaCoordenadas = [
+            'lat' => 13.439624,
+            'lng' => -88.157400
+        ];
+        
     // Método para stats de HOY
     #[Computed]
     public function statsHoy()
@@ -51,14 +57,6 @@ class Dashboard extends Component
             ->whereDate('fecha_inicio', '<=', $hoy)
             ->whereDate('fecha_fin', '>=', $hoy)
             ->get();
-
-        // if ($disponibilidadHoy->isEmpty()) {
-        //     return $repartidor->vehiculoAsignaciones()
-        //         ->where('estado', 'activo')
-        //         ->with('vehiculo')
-        //         ->limit(2)
-        //         ->get();
-        // }
 
         return $disponibilidadHoy;
     }

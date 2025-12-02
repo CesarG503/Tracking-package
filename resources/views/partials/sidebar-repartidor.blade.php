@@ -19,15 +19,16 @@
         </a>
         
         {{-- Mis Envíos (Activos) --}}
-        <a href="#" 
+        <a href="{{ route('mis-envios') }}" 
            class="w-12 h-12 rounded-xl {{ request()->routeIs('repartidor.envios') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary' : 'text-foreground-muted hover:bg-surface-secondary dark:hover:bg-surface-secondary hover:text-foreground dark:hover:text-foreground' }} flex items-center justify-center transition-colors relative group" 
            title="Mis Envíos">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
             </svg>
             {{-- Badge con contador --}}
+            {{-- TODO: aun por decidir que fecha se tomara para contar (created_at o fecha_estimada) --}}
             @php
-                $enviosPendientes = auth()->user()->envios()->whereIn('estado', ['en_ruta'])->count();
+                $enviosPendientes = auth()->user()->envios()->whereDate('created_at', now())->whereIn('estado', ['pendiente'])->count();
             @endphp
             @if($enviosPendientes > 0)
             <span class="glass glass-red !absolute -top-1 -right-1 w-5 h-5 bg-danger text-white text-xs rounded-full flex items-center justify-center font-bold">{{ $enviosPendientes }}</span>

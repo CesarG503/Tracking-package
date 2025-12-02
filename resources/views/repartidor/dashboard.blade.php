@@ -81,12 +81,21 @@ function updateMapTheme(theme = getCurrentTheme()) {
 }
 
 function centerMap() {
+    const empresaLat = {{ $empresaCoordenadas['lat'] }};
+    const empresaLng = {{ $empresaCoordenadas['lng'] }};
+
     if (map) {
-        map.setView([13.7, -89.2], 12);
+        map.setView([empresaLat, empresaLng], 13);
     }
 }
 
 function initializeMap() {
+    // Coordenadas de la empresa
+    const empresaLat = {{ $empresaCoordenadas['lat'] }};
+    const empresaLng = {{ $empresaCoordenadas['lng'] }};
+
+    console.log('Empresa coords:', empresaLat, empresaLng);
+
     if (mapInitialized) {
         console.log('Map already initialized');
         return;
@@ -100,7 +109,7 @@ function initializeMap() {
 
     mapContainer.innerHTML = '';
     
-    map = L.map('ruta-map').setView([13.7, -89.2], 12);
+    map = L.map('ruta-map').setView([empresaLat, empresaLng], 13);
     
     const currentTheme = getCurrentTheme();
     const layerConfig = mapLayers[currentTheme];
@@ -127,6 +136,18 @@ function initializeMap() {
     window.addEventListener('themeChanged', (event) => {
         updateMapTheme(event.detail.theme);
     });
+
+
+    // Marcador de la empresa (icono por defecto)
+    companyMarker = L.marker([empresaLat, empresaLng])
+        .addTo(map) 
+        .bindPopup(`
+            <div class="text-center">
+                <h3 class="font-bold text-lg mb-1">TrackFlow</h3>
+                <p class="text-sm text-gray-600">Centro de Distribución</p>
+            </div>
+        `);
+
 
     setTimeout(() => {
         map.invalidateSize();
