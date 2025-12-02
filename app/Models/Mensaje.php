@@ -10,7 +10,7 @@ class Mensaje extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['envio_id', 'mensaje', 'es_repartidor'];
+    protected $fillable = ['envio_id', 'mensaje', 'es_repartidor', 'leido'];
 
     public function envio()
     {

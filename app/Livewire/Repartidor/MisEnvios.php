@@ -45,6 +45,9 @@ class MisEnvios extends Component
         $query = Auth::user()->envios()
             ->whereDate('created_at', now()->toDateString())
             ->with(['vehiculoAsignacion.vehiculo'])
+            ->withCount(['mensajes as mensajes_cliente_count' => function ($query) {
+                $query->where('es_repartidor', false)->where('leido', false);
+            }])
             ->orderBy('created_at', 'desc');
 
         if ($this->estadoSeleccionado !== 'todos') {

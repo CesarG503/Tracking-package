@@ -111,6 +111,20 @@
 
                         {{-- Acciones Rápidas --}}
                         <div class="flex gap-2 pt-3 border-t border-foreground/5" onclick="event.stopPropagation()">
+                            {{-- Botón de Mensajes --}}
+                            <a href="{{ route('tracking', $envio->codigo) }}" 
+                               class="relative flex items-center justify-center w-10 h-10 rounded-lg glass-subtle text-foreground hover:bg-primary/10 hover:text-primary transition-all"
+                               title="Mensajes con el cliente">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+                                </svg>
+                                @if($envio->mensajes_cliente_count > 0)
+                                    <span class="absolute -top-1 -right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold flex items-center justify-center rounded-full">
+                                        {{ $envio->mensajes_cliente_count }}
+                                    </span>
+                                @endif
+                            </a>
+
                             @if($envio->estado === 'pendiente')
                                 <button 
                                     wire:click="cambiarEstado({{ $envio->id }}, 'en_ruta')"
@@ -121,7 +135,7 @@
                                 <button 
                                     wire:click="cambiarEstado({{ $envio->id }}, 'entregado')"
                                     class="flex-1 glass-green text-success px-3 py-2 rounded-lg text-sm font-medium hover:shadow-md transition-all">
-                                    Marcar Entregado
+                                    Entregado
                                 </button>
                                 <button 
                                     wire:click="cambiarEstado({{ $envio->id }}, 'devuelto')"
@@ -193,68 +207,70 @@
 
     {{-- Modal para Actualizar Estado --}}
     @if($mostrarModal)
-        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" wire:click="cerrarModal">
-            <div class="glass-card rounded-2xl p-6 max-w-md w-full" wire:click.stop onclick="event.stopPropagation()">
-                <h3 class="text-xl font-bold text-foreground mb-4">
-                    {{ $nuevoEstado === 'entregado' ? 'Confirmar Entrega' : 'Confirmar Devolución' }}
-                </h3>
+        @teleport('body')
+            <div class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-center justify-center p-4" wire:click="cerrarModal">
+                <div class="glass-card rounded-2xl p-6 max-w-md w-full" wire:click.stop onclick="event.stopPropagation()">
+                    <h3 class="text-xl font-bold text-foreground mb-4">
+                        {{ $nuevoEstado === 'entregado' ? 'Confirmar Entrega' : 'Confirmar Devolución' }}
+                    </h3>
 
-                <form wire:submit.prevent="actualizarEstado">
-                    {{-- Foto de Entrega --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-foreground mb-2">
-                            Foto de Entrega {{ $nuevoEstado === 'entregado' ? '(Requerida)' : '(Opcional)' }}
-                        </label>
-                        <input 
-                            type="file" 
-                            wire:model="foto_entrega"
-                            accept="image/*"
-                            capture="environment"
-                            class="w-full px-4 py-2 glass-subtle rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50">
-                        @error('foto_entrega') 
-                            <span class="text-danger text-xs mt-1">{{ $message }}</span> 
-                        @enderror
+                    <form wire:submit.prevent="actualizarEstado">
+                        {{-- Foto de Entrega --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-foreground mb-2">
+                                Foto de Entrega {{ $nuevoEstado === 'entregado' ? '(Requerida)' : '(Opcional)' }}
+                            </label>
+                            <input 
+                                type="file" 
+                                wire:model="foto_entrega"
+                                accept="image/*"
+                                capture="environment"
+                                class="w-full px-4 py-2 glass-subtle rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50">
+                            @error('foto_entrega') 
+                                <span class="text-danger text-xs mt-1">{{ $message }}</span> 
+                            @enderror
 
-                        @if ($foto_entrega)
-                            <div class="mt-3">
-                                <p class="text-sm text-foreground-muted mb-2">Vista previa:</p>
-                                <img src="{{ $foto_entrega->temporaryUrl() }}" class="w-full h-48 object-cover rounded-xl">
-                            </div>
-                        @endif
-                    </div>
+                            @if ($foto_entrega)
+                                <div class="mt-3">
+                                    <p class="text-sm text-foreground-muted mb-2">Vista previa:</p>
+                                    <img src="{{ $foto_entrega->temporaryUrl() }}" class="w-full h-48 object-cover rounded-xl">
+                                </div>
+                            @endif
+                        </div>
 
-                    {{-- Observaciones --}}
-                    <div class="mb-4">
-                        <label class="block text-sm font-medium text-foreground mb-2">
-                            Observaciones
-                        </label>
-                        <textarea 
-                            wire:model="observaciones"
-                            rows="3"
-                            placeholder="Agregar comentarios sobre la entrega..."
-                            class="w-full px-4 py-2 glass-subtle rounded-xl text-foreground placeholder-foreground-muted focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
-                        @error('observaciones') 
-                            <span class="text-danger text-xs mt-1">{{ $message }}</span> 
-                        @enderror
-                    </div>
+                        {{-- Observaciones --}}
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-foreground mb-2">
+                                Observaciones
+                            </label>
+                            <textarea 
+                                wire:model="observaciones"
+                                rows="3"
+                                placeholder="Agregar comentarios sobre la entrega..."
+                                class="w-full px-4 py-2 glass-subtle rounded-xl text-foreground placeholder-foreground-muted focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"></textarea>
+                            @error('observaciones') 
+                                <span class="text-danger text-xs mt-1">{{ $message }}</span> 
+                            @enderror
+                        </div>
 
-                    {{-- Botones --}}
-                    <div class="flex gap-3">
-                        <button 
-                            type="button"
-                            wire:click="cerrarModal"
-                            class="flex-1 glass-subtle text-foreground px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all">
-                            Cancelar
-                        </button>
-                        <button 
-                            type="submit"
-                            class="flex-1 {{ $nuevoEstado === 'entregado' ? 'glass-green text-success' : 'glass-red text-danger' }} px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all">
-                            Confirmar
-                        </button>
-                    </div>
-                </form>
+                        {{-- Botones --}}
+                        <div class="flex gap-3">
+                            <button 
+                                type="button"
+                                wire:click="cerrarModal"
+                                class="flex-1 glass-subtle text-foreground px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all">
+                                Cancelar
+                            </button>
+                            <button 
+                                type="submit"
+                                class="flex-1 {{ $nuevoEstado === 'entregado' ? 'glass-green text-success' : 'glass-red text-danger' }} px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all">
+                                Confirmar
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-        </div>
+        @endteleport
     @endif
 
     {{-- TODO: cambiar notificacion --}}

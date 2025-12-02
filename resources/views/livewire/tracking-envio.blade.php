@@ -122,8 +122,10 @@
 
                 {{-- Input Area --}}
                 <div class="p-4 border-t border-border">
-                    <form wire:submit.prevent="sendMessage" class="flex gap-2">
-                        <input type="text" wire:model="nuevoMensaje" 
+                    <form x-data="{ message: @entangle('nuevoMensaje') }" 
+                          @submit.prevent="if(message) { $wire.sendMessage(message); message = ''; }" 
+                          class="flex gap-2">
+                        <input type="text" x-model="message" 
                             class="flex-1 px-4 py-2 bg-surface-secondary border border-border rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                             placeholder="Escribe un mensaje..." required>
                         <button type="submit" class="p-2 bg-primary hover:bg-primary-hover text-white rounded-xl transition-colors">

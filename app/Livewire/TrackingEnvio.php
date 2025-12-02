@@ -19,10 +19,22 @@ class TrackingEnvio extends Component
         $this->envio = Envio::where('codigo', $codigo)
             ->with(['historial', 'mensajes', 'repartidor', 'vehiculoAsignacion.vehiculo'])
             ->firstOrFail();
+
+        // Marcar mensajes como leídos si es repartidor o admin
+        if (auth()->check() && (auth()->user()->isRepartidor() || auth()->user()->isAdmin())) {
+            $this->envio->mensajes()
+                ->where('es_repartidor', false)
+                ->where('leido', false)
+                ->update(['leido' => true]);
+        }
     }
 
-    public function sendMessage()
+    public function sendMessage($mensaje = null)
     {
+        if ($mensaje) {
+            $this->nuevoMensaje = $mensaje;
+        }
+
         $this->validate([
             'nuevoMensaje' => 'required|string|max:1000',
         ]);
@@ -39,7 +51,7 @@ class TrackingEnvio extends Component
             'es_repartidor' => $esRepartidor,
         ]);
 
-        $this->nuevoMensaje = '';
+        $this->reset('nuevoMensaje');
         $this->dispatch('scroll-chat');
     }
 
