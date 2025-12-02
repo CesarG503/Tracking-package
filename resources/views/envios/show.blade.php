@@ -61,6 +61,22 @@
                     <p><strong>Fecha estimada de entrega:</strong> {{ $envio->fecha_estimada->format('d/m/Y') }}</p>
                 </div>
             </div>
+            
+            {{-- QR Code Section --}}
+            <div class="bg-surface rounded-2xl p-6 shadow-sm border border-border mb-6">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 class="text-lg font-semibold text-foreground">Código de Seguimiento</h2>
+                        <p class="text-sm text-foreground-muted mt-1">Escanea para ver el estado en tiempo real</p>
+                        <a href="{{ route('tracking', $envio->codigo) }}" target="_blank" class="text-primary text-sm hover:underline mt-2 inline-block">
+                            {{ route('tracking', $envio->codigo) }}
+                        </a>
+                    </div>
+                    <div class="bg-white p-2 rounded-xl border border-border">
+                        {!! QrCode::size(100)->generate(route('tracking', $envio->codigo)) !!}
+                    </div>
+                </div>
+            </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {{-- Información del Remitente --}}

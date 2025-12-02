@@ -160,9 +160,9 @@ class EnvioController extends Controller
             $validated['foto_paquete'] = $path;
         }
 
-        Envio::create($validated);
+        $envio = Envio::create($validated);
 
-        return redirect()->route('envios.index')
+        return redirect()->route('envios.show', $envio)
             ->with('success', 'Envío creado exitosamente con código: ' . $validated['codigo']);
     }
 

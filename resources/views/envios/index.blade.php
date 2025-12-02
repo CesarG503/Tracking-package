@@ -105,6 +105,10 @@
                             <a id="preview-show-btn" href="#" class="flex-1 py-2.5 bg-surface-secondary hover:bg-border text-foreground rounded-xl text-center text-sm font-medium transition-colors">
                                 Ver Detalles
                             </a>
+                            <a id="preview-qr-btn" href="#" target="_blank" class="flex-1 py-2.5 bg-surface-secondary hover:bg-border text-foreground rounded-xl text-center text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4h2v-4zM6 6h2v2H6V6zm0 12h2v2H6v-2zm12-12h2v2h-2V6z"/></svg>
+                                QR
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -163,8 +167,13 @@ function selectEnvio(id, codigo, remitente, destinatario, email, estado, descrip
     }
 
     // Update action buttons with correct URLs
-    document.getElementById('preview-edit-btn').href = `/envios/${id}/edit`;
-    document.getElementById('preview-show-btn').href = `/envios/${id}`;
+    const editUrl = "{{ route('envios.edit', ':id') }}";
+    const showUrl = "{{ route('envios.show', ':id') }}";
+    const trackingUrl = "{{ route('tracking', ':codigo') }}";
+
+    document.getElementById('preview-edit-btn').href = editUrl.replace(':id', id);
+    document.getElementById('preview-show-btn').href = showUrl.replace(':id', id);
+    document.getElementById('preview-qr-btn').href = trackingUrl.replace(':codigo', codigo);
 
     // Show content, hide empty
     document.getElementById('preview-empty').classList.add('hidden');

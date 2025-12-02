@@ -15,6 +15,7 @@ Route::get('/', function () {
 });
 
 Route::get('/livewire-test', Counter::class);
+Route::get('/tracking/{codigo}', App\Livewire\TrackingEnvio::class)->name('tracking');
 // Auth routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);

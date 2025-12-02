@@ -69,4 +69,9 @@ class Envio extends Model
     {
         return $this->hasMany(HistorialEnvio::class, 'envio_id');
     }
+
+    public function mensajes(): HasMany
+    {
+        return $this->hasMany(Mensaje::class, 'envio_id');
+    }
 }
