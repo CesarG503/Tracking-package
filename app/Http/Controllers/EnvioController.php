@@ -136,7 +136,9 @@ class EnvioController extends Controller
             'tipo_envio' => 'required|in:express,normal,economico',
             'fecha_estimada' => 'required|date|after_or_equal:today',
             'vehiculo_asignacion_id' => 'nullable|exists:vehiculo_asignaciones,id',
-            'foto_paquete' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048'
+            'foto_paquete' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'lat' => 'nullable|numeric',
+            'lng' => 'nullable|numeric',
         ]);
 
         // Generar código único
