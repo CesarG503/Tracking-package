@@ -3,14 +3,14 @@
     {{-- Logo --}}
     <div class="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 shadow-lg shadow-cyan-500/30 dark:shadow-cyan-500/40">
         <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
         </svg>
     </div>
 
     {{-- Nav Items --}}
     <nav class="flex-1 flex flex-col gap-2">
         {{-- Dashboard --}}
-        <a href="#" 
+        <a href=" {{ route('dashboard') }}" 
            class="w-12 h-12 rounded-xl {{ request()->routeIs('dashboard') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary' : 'text-foreground-muted hover:bg-surface-secondary dark:hover:bg-surface-secondary hover:text-foreground dark:hover:text-foreground' }} flex items-center justify-center transition-colors relative group" 
            title="Dashboard">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -34,23 +34,6 @@
             @endif
         </a>
 
-        {{-- Rutas del Día --}}
-        <a href="#" 
-           class="w-12 h-12 rounded-xl {{ request()->routeIs('repartidor.rutas') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary' : 'text-foreground-muted hover:bg-surface-secondary dark:hover:bg-surface-secondary hover:text-foreground dark:hover:text-foreground' }} flex items-center justify-center transition-colors relative group" 
-           title="Rutas del Día">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
-            </svg>
-        </a>
-
-        {{-- Mi Vehículo --}}
-        <a href="#" 
-           class="w-12 h-12 rounded-xl {{ request()->routeIs('repartidor.vehiculo') ? 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary' : 'text-foreground-muted hover:bg-surface-secondary dark:hover:bg-surface-secondary hover:text-foreground dark:hover:text-foreground' }} flex items-center justify-center transition-colors relative group" 
-           title="Mi Vehículo">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-            </svg>
-        </a>
 
         {{-- Historial --}}
         <a href="#" 
