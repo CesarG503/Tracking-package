@@ -1,5 +1,5 @@
 <div>
-            <div class="max-w-7xl mx-auto space-y-6">
+        <div class="max-w-7xl mx-auto space-y-6">
             {{-- Header con Notificaciones --}}
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <div class="flex items-center justify-between gap-4">
@@ -7,17 +7,6 @@
                         <h1 class="text-2xl lg:text-3xl font-bold text-foreground">Bienvenido, {{ auth()->user()->nombre }}</h1>
                         <p class="text-foreground-muted mt-1">{{ \Carbon\Carbon::now()->locale('es')->translatedFormat('l, d F Y') }}</p>
                     </div>
-                    {{-- Notificaciones --}}
-                    <button type="button" style="overflow: visible"
-                            class="w-12 h-12 glass glass-medium rounded-xl text-foreground hover:bg-surface-secondary dark:hover:bg-surface-secondary hover:text-foreground dark:hover:text-foreground flex items-center justify-center transition-colors relative group" 
-                            title="Notificaciones">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
-                        </svg>
-                        {{-- Badge de notificaciones --}}
-                        <span class="glass glass-static glass-red !absolute -top-1 -right-1 w-5 h-5 bg-warning text-white text-xs rounded-full flex items-center justify-center font-bold">3</span>
-                        <span class="glass glass-static animate-ping glass-red !absolute -top-1 -right-1 w-5 h-5 bg-warning text-white text-xs rounded-full flex items-center justify-center font-bold"></span>
-                    </button>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -168,7 +157,7 @@
                                 </svg>
                                 Actividad Reciente
                             </h2>
-                            <a href="#" class="glass glass-subtle px-3 py-1.5 rounded-lg text-sm font-medium hover:shadow-md transition-all">
+                            <a href="{{ route('mis-envios') }}" class="glass glass-subtle px-3 py-1.5 rounded-lg text-sm font-medium hover:shadow-md transition-all">
                                 Ver todo
                             </a>
                         </div>
@@ -225,52 +214,53 @@
                             Mis Vehículos
                         </h2>
 
-                        @forelse($this->vehiculosHoy as $item)
-                            @if(isset($item->vehiculo))
-                                <div class="glass glass-subtle rounded-xl p-4 mb-4">
-                                    <div class="flex items-center gap-3 mb-3">
-                                        <div class="w-12 h-12 rounded-xl glass glass-blue flex items-center justify-center">
-                                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                                            </svg>
+                        <div class="flex flex-col gap-6">
+                            @forelse($this->vehiculosHoy as $item)
+                                @if(isset($item->vehiculo))
+                                    <div class="flex flex-col gap-3">
+                                        <div class="glass glass-subtle rounded-xl p-4">
+                                            <div class="flex items-center gap-3 mb-3">
+                                                <div class="w-12 h-12 rounded-xl glass glass-blue flex items-center justify-center">
+                                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                                    </svg>
+                                                </div>
+                                                <div>
+                                                    <p class="font-semibold text-foreground">{{ $item->vehiculo->marca }} {{ $item->vehiculo->modelo }}</p>
+                                                    <p class="text-sm text-foreground-muted">Año {{ $item->vehiculo->anio }}</p>
+                                                </div>
+                                            </div>
+                                            <div class="space-y-2">
+                                                <div class="flex items-center justify-between text-sm">
+                                                    <span class="text-foreground-muted">Placa</span>
+                                                    <span class="font-mono glass glass-subtle px-2 py-0.5 rounded">{{ $item->vehiculo->placa }}</span>
+                                                </div>
+                                                <div class="flex items-center justify-between text-sm">
+                                                    <span class="text-foreground-muted">Capacidad</span>
+                                                    <span class="text-foreground font-medium">{{ $item->vehiculo->capacidad ?? 'N/A' }}</span>
+                                                </div>
+                                                <div class="flex items-center justify-between text-sm">
+                                                    <span class="text-foreground-muted">Estado</span>
+                                                    <span class="glass glass-green glass-subtle px-2 py-0.5 rounded text-success text-xs font-semibold">Activo</span>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p class="font-semibold text-foreground">{{ $item->vehiculo->marca }} {{ $item->vehiculo->modelo }}</p>
-                                            <p class="text-sm text-foreground-muted">Año {{ $item->vehiculo->anio }}</p>
-                                        </div>
+                                        <a href="#" class="block text-center glass glass-subtle px-4 py-2 rounded-xl text-sm font-medium hover:shadow-md transition-all">
+                                            Ver detalles
+                                        </a>
                                     </div>
-                                    <div class="space-y-2">
-                                        <div class="flex items-center justify-between text-sm">
-                                            <span class="text-foreground-muted">Placa</span>
-                                            <span class="font-mono glass glass-subtle px-2 py-0.5 rounded">{{ $item->vehiculo->placa }}</span>
-                                        </div>
-                                        <div class="flex items-center justify-between text-sm">
-                                            <span class="text-foreground-muted">Capacidad</span>
-                                            <span class="text-foreground font-medium">{{ $item->vehiculo->capacidad ?? 'N/A' }}</span>
-                                        </div>
-                                        <div class="flex items-center justify-between text-sm">
-                                            <span class="text-foreground-muted">Estado</span>
-                                            <span class="glass glass-green glass-subtle px-2 py-0.5 rounded text-success text-xs font-semibold">Activo</span>
-                                        </div>
+                                @endif
+                            @empty
+                                <div class="text-center py-8">
+                                    <div class="w-16 h-16 mx-auto mb-3 rounded-xl glass glass-subtle flex items-center justify-center">
+                                        <svg class="w-8 h-8 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                        </svg>
                                     </div>
+                                    <p class="text-foreground-muted mb-3">Sin vehículo asignado</p>
                                 </div>
-                                <a href="#" class="block text-center glass glass-subtle px-4 py-2 rounded-xl text-sm font-medium hover:shadow-md transition-all">
-                                    Ver detalles
-                                </a>
-                            @endif
-                        @empty
-                            <div class="text-center py-8">
-                                <div class="w-16 h-16 mx-auto mb-3 rounded-xl glass glass-subtle flex items-center justify-center">
-                                    <svg class="w-8 h-8 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
-                                    </svg>
-                                </div>
-                                <p class="text-foreground-muted mb-3">Sin vehículo asignado</p>
-                                <button class="glass glass-subtle px-4 py-2 rounded-xl text-sm font-medium">
-                                    Solicitar asignación
-                                </button>
-                            </div>
-                        @endforelse
+                            @endforelse
+                        </div>
                     </div>
 
                     {{-- Mi Disponibilidad --}}
