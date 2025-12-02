@@ -37,7 +37,7 @@
                 @csrf
                 
                 <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700 dark:text-foreground mb-2">
+                    <label for="email" class="block text-sm font-medium text-foreground-muted mb-2">
                         Correo Electrónico
                     </label>
                     <div class="relative">
@@ -53,7 +53,7 @@
                             value="{{ old('email') }}"
                             required 
                             autofocus
-                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 outline-none @error('email') border-red-400 @enderror"
+                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-surface text-foreground focus:bg-surface-secondary focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 outline-none @error('email') border-red-400 @enderror"
                             placeholder="correo@ejemplo.com"
                         >
                     </div>
@@ -68,7 +68,7 @@
                 </div>
 
                 <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                    <label for="password" class="block text-sm font-medium text-foreground-muted mb-2">
                         Contraseña
                     </label>
                     <div class="relative">
@@ -82,7 +82,7 @@
                             name="password" 
                             type="password" 
                             required
-                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-white/50 focus:bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 outline-none @error('password') border-red-400 @enderror"
+                            class="w-full pl-12 pr-4 py-3 rounded-xl border border-gray-200 bg-surface text-foreground focus:bg-surface-secondary focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 outline-none @error('password') border-red-400 @enderror"
                             placeholder="••••••••"
                         >
                     </div>
@@ -99,7 +99,7 @@
                 <div class="flex items-center justify-between">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="checkbox" name="remember" class="w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500/20">
-                        <span class="text-sm text-gray-600">Recordarme</span>
+                        <span class="text-sm text-foreground-muted">Recordarme</span>
                     </label>
                 </div>
 

@@ -14,6 +14,7 @@ class Envio extends Model
     protected $table = 'envios';
 
     protected $fillable = [
+        'codigo',
         'remitente_nombre',
         'remitente_telefono',
         'remitente_direccion',
@@ -67,10 +68,5 @@ class Envio extends Model
     public function historial(): HasMany
     {
         return $this->hasMany(HistorialEnvio::class, 'envio_id');
-    }
-
-    public function getCodigoAttribute(): string
-    {
-        return str_pad($this->id, 5, '0', STR_PAD_LEFT) . '-' . str_pad(rand(10000, 99999), 5, '0', STR_PAD_LEFT);
     }
 }

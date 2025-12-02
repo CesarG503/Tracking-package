@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Disponibilidad;
 use App\Models\User;
 use App\Models\Vehiculo;
 use App\Models\VehiculoAsignacion;
@@ -105,8 +106,27 @@ class DatabaseSeeder extends Seeder
             'estado' => 'activo',
         ]);
 
+        Disponibilidad::create([
+            "vehiculo_id" => $vehiculo1->id,
+            "repartidor_id" => $repartidor1->id,
+            "fecha_inicio" => now(),
+            "fecha_fin" => now()->addHours(5),
+            "tipo" => "disponible",
+            "descripcion" => "Disponibilidad para entregas matutinas",
+        ]);
+
+        Disponibilidad::create([
+            "vehiculo_id" => $vehiculo2->id,
+            "repartidor_id" => $repartidor2->id,
+            "fecha_inicio" => now(),
+            "fecha_fin" => now()->addHours(3),
+            "tipo" => "disponible",
+            "descripcion" => "Disponibilidad para entregas matutinas",
+        ]);
+
         // Create Shipments
         Envio::create([
+            'codigo' => 'ENV-CZ4YBHLS',
             'remitente_nombre' => 'Tech Solutions SA',
             'remitente_telefono' => '+52 555 111 2222',
             'remitente_direccion' => '123 Rue de la République, 13002 Marseille, France',
@@ -124,6 +144,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Envio::create([
+            'codigo' => 'ENV-CZ5YBHLS',
             'remitente_nombre' => 'Global Imports',
             'remitente_telefono' => '+44 20 7946 0958',
             'remitente_direccion' => 'London, UK',
@@ -141,6 +162,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Envio::create([
+            'codigo' => 'ENV-CZ6YBHLS',
             'remitente_nombre' => 'Rio Export Co',
             'remitente_telefono' => '+55 21 9999 8888',
             'remitente_direccion' => 'Rio de Janeiro, Brazil',
@@ -153,10 +175,10 @@ class DatabaseSeeder extends Seeder
             'tipo_envio' => 'Standard Internacional',
             'fecha_estimada' => now()->addDays(7),
             'estado' => 'en_ruta',
-            'repartidor_id' => $repartidor2->id,
         ]);
 
         Envio::create([
+            'codigo' => 'ENV-CZ7YBHLS',
             'remitente_nombre' => 'Warsaw Trading',
             'remitente_telefono' => '+48 22 123 4567',
             'remitente_direccion' => 'Warsaw, Poland',
@@ -172,6 +194,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Envio::create([
+            'codigo' => 'ENV-CZ8YBHLS',
             'remitente_nombre' => 'México Distribuidora',
             'remitente_telefono' => '+52 55 1234 5678',
             'remitente_direccion' => 'Ciudad de México, México',
@@ -187,6 +210,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Envio::create([
+            'codigo' => 'ENV-C11YBHLS',
             'remitente_nombre' => 'Barcelona Logistics',
             'remitente_telefono' => '+34 93 123 4567',
             'remitente_direccion' => 'Barcelona, Spain',

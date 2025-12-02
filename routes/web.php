@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\VehiculoController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DisponibilidadController;
+use App\Http\Controllers\EnvioController;
 use App\Livewire\Counter;
 use Illuminate\Support\Facades\Route;
 
@@ -24,6 +25,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
     Route::resource('vehiculos', VehiculoController::class);
+    Route::resource('envios', EnvioController::class);
+    Route::get('/envios/resources/available', [EnvioController::class, 'getAvailableResources'])->name('envios.available-resources');
     
     Route::resource('usuarios', UserController::class);
     Route::patch('usuarios/{usuario}/toggle-active', [UserController::class, 'toggleActive'])->name('usuarios.toggle-active');

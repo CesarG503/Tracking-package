@@ -10,7 +10,8 @@ return new class extends Migration
     {
         Schema::create('envios', function (Blueprint $table) {
             $table->id();
-            
+            //Codigo de seguimiento
+            $table->string('codigo', 200)->unique();
             // Remitente
             $table->string('remitente_nombre', 120);
             $table->string('remitente_telefono', 30)->nullable();

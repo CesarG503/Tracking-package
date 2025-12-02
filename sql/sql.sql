@@ -85,13 +85,14 @@ CREATE INDEX idx_de_tipo ON disponibilidad(tipo);
 
 CREATE TABLE envios (
     id INT AUTO_INCREMENT PRIMARY KEY,
-
+    codigo VARCHAR(50) UNIQUE,
     remitente_nombre VARCHAR(120) NOT NULL,
     remitente_telefono VARCHAR(30),
     remitente_direccion TEXT NOT NULL,
 
     destinatario_nombre VARCHAR(120) NOT NULL,
     destinatario_telefono VARCHAR(30),
+    destinatario_email VARCHAR(200),
     destinatario_direccion TEXT NOT NULL,
 
    
