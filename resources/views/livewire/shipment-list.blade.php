@@ -1,23 +1,68 @@
 <div wire:poll.5s="loadShipments" class="flex-1 flex flex-col overflow-hidden">
     <!-- Tabs -->
-    <div class="px-4 lg:px-6 pb-3 border-b border-border dark:border-border transition-colors duration-300">
-        <div class="flex gap-2">
+    <div class="px-4 lg:px-6 pb-3 border-b border-border dark:border-border transition-colors duration-300 mt-1">
+        <div class="flex justify-between items-center mb-3">
+            <div class="flex gap-2">
+                <button 
+                    wire:click="setActiveTab('pendiente')"
+                    class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-colors {{ $activeTab === 'pendiente' ? 'bg-foreground text-background' : 'text-foreground-muted' }}">
+                    Pendientes
+                </button>
+                <button 
+                    wire:click="setActiveTab('en_ruta')"
+                    class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-colors {{ $activeTab === 'en_ruta' ? 'bg-foreground text-background' : 'text-foreground-muted' }}">
+                    Rutas
+                </button>
+                <button 
+                    wire:click="setActiveTab('entregado')"
+                    class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-colors {{ $activeTab === 'entregado' ? 'bg-foreground text-background' : 'text-foreground-muted' }}">
+                    Entregados
+                </button>
+            </div>
+            
+            <!-- Botón de búsqueda -->
             <button 
-                wire:click="setActiveTab('pendiente')"
-                class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-colors {{ $activeTab === 'pendiente' ? 'bg-foreground text-background' : 'text-foreground-muted' }}">
-                Pendientes
-            </button>
-            <button 
-                wire:click="setActiveTab('en_ruta')"
-                class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-colors {{ $activeTab === 'en_ruta' ? 'bg-foreground text-background' : 'text-foreground-muted' }}">
-                Rutas
-            </button>
-            <button 
-                wire:click="setActiveTab('entregado')"
-                class="px-3 py-1.5 lg:px-4 lg:py-2 rounded-full text-xs lg:text-sm font-medium transition-colors {{ $activeTab === 'entregado' ? 'bg-foreground text-background' : 'text-foreground-muted' }}">
-                Entregados
+                wire:click="toggleSearch"
+                class="p-2 rounded-full text-foreground-muted hover:text-foreground hover:bg-surface-secondary transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
             </button>
         </div>
+        
+        <!-- Input de búsqueda desplegable -->
+        @if($showSearch)
+        <div class="mb-3 animate-fade-in">
+            <div class="relative">
+                <input 
+                    type="text" 
+                    wire:model.live.debounce.300ms="searchTerm"
+                    placeholder="Buscar por código, dirección, destinatario o repartidor..."
+                    class="w-full px-4 py-2 pl-10 pr-10 bg-surface dark:bg-surface-dark border border-border dark:border-border rounded-xl text-foreground placeholder:text-foreground-muted focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                    x-ref="searchInput"
+                >
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                </div>
+                @if($searchTerm)
+                <button 
+                    wire:click="$set('searchTerm', '')"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-foreground-muted hover:text-foreground transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+                @endif
+            </div>
+            @if($searchTerm && !empty($searchTerm))
+            <p class="text-xs text-foreground-muted mt-2">
+                Buscando "{{ $searchTerm }}" en {{ ucfirst($activeTab === 'en_ruta' ? 'envíos en ruta' : ($activeTab === 'pendiente' ? 'envíos pendientes' : 'envíos entregados')) }}
+            </p>
+            @endif
+        </div>
+        @endif
     </div>
 
     <!-- Package List -->
@@ -32,7 +77,7 @@
                             {{ Str::limit($envio->remitente_direccion, 15) }} → {{ Str::limit($envio->destinatario_direccion, 15) }}
                         </h3>
                         <p class="text-sm text-foreground-muted dark:text-foreground-muted">
-                            Order ID #{{ str_pad($envio->id, 5, '0', STR_PAD_LEFT) }}-{{ rand(10000,99999) }}
+                            #{{ $envio->codigo }}
                         </p>
                     </div>
                     <div class="flex items-center gap-2">
@@ -109,22 +154,41 @@
                         <h3 class="font-semibold text-foreground">
                             {{ Str::limit($envio->remitente_direccion, 15) }} → {{ Str::limit($envio->destinatario_direccion, 15) }}
                         </h3>
-                        <p class="text-sm text-foreground-muted">Order ID #{{ str_pad($envio->id, 5, '0', STR_PAD_LEFT) }}-{{ rand(10000,99999) }}</p>
+                        <p class="text-sm text-foreground-muted">#{{ $envio->codigo }}</p>
                     </div>
                     <span class="status-badge px-3 py-1 rounded-full text-xs font-medium bg-warning-light text-warning">
                         Pendiente
                     </span>
                 </div>
-                
-                <button
-                    type="button"
-                    class="w-full py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2"
-                    data-envio-id="{{ $envio->id }}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                    </svg>
-                    Asignar Repartidor
-                </button>
+                    @isset($envio->repartidor)
+                        <div>
+                            <p class="text-sm text-foreground-muted mb-4">
+                                Repartidor asignado: {{ $envio->repartidor->nombre }}.
+                            </p>
+                        </div>
+                        <a
+                            href="{{ route('envios.show',$envio->id) }}"
+                            class="w-full py-2.5 bg-success hover:bg-success-hover text-white rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 4h10a2 2 0 012 2v10a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2zm2 4h.01M12 11h.01M16 11h.01M8 15h.01M12 15h.01M16 15h.01"/>
+                            </svg>
+                            Programado para {{ $envio->fecha_estimada->format('d/m/Y') }}
+                        </a>
+                    @else
+                        <div>
+                            <p class="text-sm text-foreground-muted mb-4">
+                                Asigna un repartidor para iniciar la entrega de este envío.
+                            </p>
+                        </div>
+                        <a
+                            href="{{ route('envios.edit', $envio->id) }}#asignacionRepartidor"
+                            class="w-full py-2.5 bg-primary hover:bg-primary-hover text-white rounded-xl text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
+                            Asignar Repartidor
+                        </a>
+                    @endisset
             </div>
             @endforeach
         </div>
@@ -196,4 +260,54 @@
             @endforelse
         </div>
     </div>
+    <style>
+    .animate-fade-in {
+        animation: fadeIn 0.2s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sincronizar el tab activo con localStorage al cargar
+        const savedTab = localStorage.getItem('shipment_list_active_tab');
+        if (savedTab && savedTab !== @json($activeTab)) {
+            @this.call('setActiveTab', savedTab);
+        }
+        
+        // Escuchar cambios en los botones de tabs
+        document.querySelectorAll('[wire\\:click^="setActiveTab"]').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabName = this.getAttribute('wire:click').match(/setActiveTab\('(.+)'\)/)[1];
+                localStorage.setItem('shipment_list_active_tab', tabName);
+            });
+        });
+        
+        // Sincronizar con otras pestañas/ventanas del navegador
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'shipment_list_active_tab' && e.newValue) {
+                @this.call('setActiveTab', e.newValue);
+            }
+        });
+
+        // Auto-focus en el input de búsqueda cuando se abre
+        document.addEventListener('livewire:updated', function () {
+            const searchInput = document.querySelector('input[wire\\:model\\.live\\.debounce\\.300ms="searchTerm"]');
+            if (searchInput && @json($showSearch)) {
+                setTimeout(() => searchInput.focus(), 100);
+            }
+        });
+    });
+</script>

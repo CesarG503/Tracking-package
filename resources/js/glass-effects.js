@@ -199,7 +199,6 @@ class GlassEffects {
         } else {
             element.style.width = `${config.width}px`;
             element.style.height = `${config.height}px`;
-            element.style.display = 'flex';
             element.style.alignItems = 'center';
             element.style.justifyContent = 'center';
             
@@ -283,7 +282,6 @@ class GlassEffects {
         } else {
             element.style.width = `${config.width}px`;
             element.style.height = `${config.height}px`;
-            element.style.display = 'flex';
             element.style.alignItems = 'center';
             element.style.justifyContent = 'center';
         }

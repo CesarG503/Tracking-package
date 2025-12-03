@@ -12,7 +12,7 @@
 
         
         <!-- Left Panel - Package List -->
-        <div id="shipment-panel" class="w-full lg:w-[420px] glass-sidebar border-r border-white/20 flex flex-col overflow-hidden h-[27vh] max-h-[27vh] lg:h-full lg:max-h-full transition-all duration-300 ease-out">
+        <div id="shipment-panel" class="pt-3 w-full lg:w-[420px] glass-sidebar border-r border-white/20 flex flex-col overflow-hidden h-[27vh] max-h-[27vh] lg:h-full lg:max-h-full transition-all duration-300 ease-out">
             <button id="toggle-shipments" class="lg:hidden w-full flex items-center justify-center b active:scale-95">`
                 <div class="w-12 h-1 bg-foreground-muted/40 rounded-full"></div>
             </button>    
@@ -20,11 +20,6 @@
             <div class="px-4 lg:px-6 pb-3 transition-colors duration-300">
                 <div class="flex items-center justify-between mb-4">
                     <h1 class="text-xl font-bold text-foreground dark:text-foreground">Seguimiento de Envios</h1>
-                    <button class="w-10 h-10 rounded-xl bg-surface-secondary dark:bg-surface-secondary flex items-center justify-center text-foreground-muted dark:text-foreground-muted hover:bg-border dark:hover:bg-border transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                        </svg>
-                    </button>
                 </div>
             </div>
 

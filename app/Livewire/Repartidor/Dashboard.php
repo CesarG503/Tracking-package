@@ -45,20 +45,30 @@ class Dashboard extends Component
         ];
     }
 
-    // Vehículo(s) asignado(s) para HOY
+    // Vehículo(s) asignado(s) para ESTA SEMANA
     #[Computed]
-    public function vehiculosHoy()
+    public function vehiculosSemana()
     {
         $repartidor = Auth::user();
-        $hoy = now();
+        $inicioSemana = now()->startOfWeek();
+        $finSemana = now()->endOfWeek();
 
-        $disponibilidadHoy = $repartidor->vehiculoAsignaciones()
+        // Obtener asignaciones que se solapen con la semana actual
+        $asignacionesSemana = $repartidor->vehiculoAsignaciones()
             ->where('estado', 'activo')
-            ->whereDate('fecha_inicio', '<=', $hoy)
-            ->whereDate('fecha_fin', '>=', $hoy)
-            ->get();
+            ->where(function($query) use ($inicioSemana, $finSemana) {
+                $query->whereBetween('fecha_inicio', [$inicioSemana, $finSemana])
+                      ->orWhereBetween('fecha_fin', [$inicioSemana, $finSemana])
+                      ->orWhere(function($q) use ($inicioSemana, $finSemana) {
+                          $q->where('fecha_inicio', '<=', $inicioSemana)
+                            ->where('fecha_fin', '>=', $finSemana);
+                      });
+            })
+            ->with('vehiculo')
+            ->get()
+            ->unique('vehiculo_id'); // Mostrar vehículos únicos asignados esta semana
 
-        return $disponibilidadHoy;
+        return $asignacionesSemana;
     }
 
     // Actividad reciente (últimos 7 días)
@@ -107,8 +117,9 @@ class Dashboard extends Component
                 'fecha' => $fecha->format('Y-m-d'),
                 'dia_nombre' => $fecha->locale('es')->translatedFormat('D'),
                 'dia_numero' => $fecha->format('d'),
-                'tipo' => $evento ? $evento->tipo : 'disponible',
+                'tipo' => $evento ? $evento->tipo : null, // Null si no hay evento (no mostrar 'disponible')
                 'descripcion' => $evento ? $evento->descripcion : null,
+                'horario' => $evento ? \Carbon\Carbon::parse($evento->fecha_inicio)->format('H:i') . ' - ' . \Carbon\Carbon::parse($evento->fecha_fin)->format('H:i') : null,
                 'es_hoy' => $fecha->isToday()
             ];
         }

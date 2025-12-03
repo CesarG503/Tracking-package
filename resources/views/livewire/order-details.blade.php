@@ -1,13 +1,13 @@
 <div>
     @if($showCard && $selectedShipment)
         <!-- Order Details Card - Original Design -->
-        <div id="order-details-card" class="bottom-3 left-3 right-3 lg:bottom-4 glass lg:left-4 lg:right-4 rounded-2xl p-4 lg:p-5 z-[999] max-w-full rounded-xl text-foreground transition-colors shadow-lg !absolute glass-card dark:glass-card-dark" style="touch-action: none;">
+        <div id="order-details-card" class="bottom-3 left-3 right-3 lg:bottom-4 glass-advanced lg:left-4 lg:right-4 rounded-2xl p-4 lg:p-5 z-[999] max-w-full rounded-xl text-foreground transition-colors shadow-lg !absolute glass-card dark:glass-card-dark" style="touch-action: none;">
             
             <div class="flex items-start justify-between">
                 <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 lg:gap-3 mb-3 lg:mb-4 flex-wrap">
                         <h2 class="text-base lg:text-lg font-bold text-foreground truncate">
-                            Order ID #{{ str_pad($selectedShipment->id, 5, '0', STR_PAD_LEFT) }}
+                            #{{ str_pad($selectedShipment->codigo, 5, '0', STR_PAD_LEFT) }}
                         </h2>
                         <span class="px-3 py-1 rounded-full text-xs font-medium 
                             {{ $selectedShipment->estado === 'en_ruta' ? 'bg-warning-light text-warning' : '' }}
@@ -81,7 +81,7 @@
         </div>
     @else
         <!-- Empty State - Compact Design -->
-        <div class="bottom-3 left-3 right-3 lg:bottom-4 glass lg:left-4 lg:right-4 rounded-2xl p-4 lg:p-5 z-[999] max-w-full rounded-xl text-foreground transition-colors shadow-lg !absolute glass-card dark:glass-card-dark text-center">
+        <div class="bottom-3 left-3 right-3 lg:bottom-4 glass-advanced lg:left-4 lg:right-4 rounded-2xl p-4 lg:p-5 z-[999] max-w-full rounded-xl text-foreground transition-colors shadow-lg !absolute glass-card dark:glass-card-dark text-center">
             <div class="w-12 h-12 mx-auto mb-3 bg-surface-secondary rounded-full flex items-center justify-center">
                 <svg class="w-6 h-6 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/>
