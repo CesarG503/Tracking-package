@@ -105,10 +105,10 @@
                             <a id="preview-show-btn" href="#" class="flex-1 py-2.5 bg-surface-secondary hover:bg-border text-foreground rounded-xl text-center text-sm font-medium transition-colors">
                                 Ver Detalles
                             </a>
-                            <a id="preview-qr-btn" href="#" target="_blank" class="flex-1 py-2.5 bg-surface-secondary hover:bg-border text-foreground rounded-xl text-center text-sm font-medium transition-colors flex items-center justify-center gap-2">
+                            <button id="preview-qr-btn" class="flex-1 py-2.5 bg-surface-secondary hover:bg-border text-foreground rounded-xl text-center text-sm font-medium transition-colors flex items-center justify-center gap-2">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4h2v-4zM6 6h2v2H6V6zm0 12h2v2H6v-2zm12-12h2v2h-2V6z"/></svg>
                                 QR
-                            </a>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -117,8 +117,145 @@
     </main>
 </div>
 
+{{-- Modal para QR Code --}}
+<div id="qrModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 items-center justify-center p-4">
+    <div class="relative bg-white rounded-2xl p-8 max-w-md mx-auto shadow-2xl">
+        <button onclick="closeQRModal()" class="absolute -top-4 -right-4 bg-white rounded-full p-2 text-gray-600 hover:text-gray-800 transition-colors shadow-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+        </button>
+        
+        <div class="text-center">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Código QR de Seguimiento</h3>
+            <div id="qrCodeLarge" class="flex justify-center mb-4">
+                <!-- QR Code will be generated here -->
+            </div>
+            <p id="qrModalCode" class="text-sm text-gray-600 mb-4">Código: </p>
+            <div class="flex justify-center gap-3">
+                <button onclick="downloadQRFromModal()" class="px-4 py-2 bg-success hover:bg-success-hover text-white rounded-xl text-sm font-medium transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                    </svg>
+                    Descargar
+                </button>
+                <a id="qrModalLink" href="#" target="_blank" class="px-4 py-2 bg-primary hover:bg-primary-hover text-white rounded-xl text-sm font-medium transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+                    </svg>
+                    Ver Seguimiento
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
+// Variables globales para QR
+let currentQRCode = '';
+let currentTrackingUrl = '';
+
+// Funciones QR Modal
+function openQRModal(codigo, trackingUrl) {
+    currentQRCode = codigo;
+    currentTrackingUrl = trackingUrl;
+    
+    // Actualizar contenido del modal
+    document.getElementById('qrModalCode').textContent = 'Código: ' + codigo;
+    document.getElementById('qrModalLink').href = trackingUrl;
+    
+    // Generar QR Code usando una librería externa o API
+    generateQRCode(trackingUrl, 'qrCodeLarge');
+    
+    // Mostrar modal
+    const modal = document.getElementById('qrModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeQRModal() {
+    const modal = document.getElementById('qrModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+function generateQRCode(url, containerId) {
+    const container = document.getElementById(containerId);
+    // Usar QR Code API gratuita
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(url)}`;
+    container.innerHTML = `<img src="${qrUrl}" alt="QR Code" class="rounded-lg">`;
+}
+
+function downloadQRFromModal() {
+    if (!currentQRCode || !currentTrackingUrl) return;
+    
+    // Crear canvas para la descarga
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Configurar canvas
+    canvas.width = 350;
+    canvas.height = 400;
+    
+    // Crear imagen del QR
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(currentTrackingUrl)}`;
+    const img = new Image();
+    
+    img.onload = function() {
+        // Fondo blanco
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Configurar fuente
+        ctx.fillStyle = '#1f2937';
+        ctx.textAlign = 'center';
+        
+        // Título principal
+        ctx.font = 'bold 24px Arial';
+        ctx.fillText('Código de Paquete', canvas.width / 2, 40);
+        
+        // Línea decorativa
+        ctx.strokeStyle = '#e5e7eb';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(50, 60);
+        ctx.lineTo(canvas.width - 50, 60);
+        ctx.stroke();
+        
+        // Dibujar QR centrado
+        const qrSize = 250;
+        const qrX = (canvas.width - qrSize) / 2;
+        const qrY = 80;
+        ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+        
+        // Texto del código debajo del QR
+        ctx.font = 'bold 18px Arial';
+        ctx.fillText('Código: ' + currentQRCode, canvas.width / 2, qrY + qrSize + 40);
+        
+        // Texto adicional más pequeño
+        ctx.font = '14px Arial';
+        ctx.fillStyle = '#6b7280';
+        ctx.fillText('Escanea para seguimiento en tiempo real', canvas.width / 2, qrY + qrSize + 65);
+        
+        // Descargar
+        const link = document.createElement('a');
+        link.download = 'qr-envio-' + currentQRCode + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    };
+    
+    img.crossOrigin = 'anonymous';
+    img.src = qrUrl;
+}
+
+// Cerrar modal con ESC y click fuera
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeQRModal();
+    }
+});
+
 // Mobile preview toggle functionality
 document.addEventListener('DOMContentLoaded', function() {
     const toggleBtn = document.getElementById('preview-toggle');
@@ -173,7 +310,11 @@ function selectEnvio(id, codigo, remitente, destinatario, email, estado, descrip
 
     document.getElementById('preview-edit-btn').href = editUrl.replace(':id', id);
     document.getElementById('preview-show-btn').href = showUrl.replace(':id', id);
-    document.getElementById('preview-qr-btn').href = trackingUrl.replace(':codigo', codigo);
+    
+    // Configurar el botón QR para abrir modal
+    document.getElementById('preview-qr-btn').onclick = function() {
+        openQRModal(codigo, trackingUrl.replace(':codigo', codigo));
+    };
 
     // Show content, hide empty
     document.getElementById('preview-empty').classList.add('hidden');
@@ -269,6 +410,13 @@ function confirmCancel(id, codigo) {
         }
     });
 }
+
+// Cerrar modal QR al hacer click fuera
+document.getElementById('qrModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+        closeQRModal();
+    }
+});
 </script>
 @endpush
 @endsection

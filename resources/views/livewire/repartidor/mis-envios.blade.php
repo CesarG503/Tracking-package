@@ -1,7 +1,7 @@
 {{-- resources/views/livewire/repartidor/mis-envios.blade.php --}}
 {{-- TODO: cambiar mejores estilos y evitar que se cierre al abrir la ventana
     de envios al estar en moviles --}}
-<div wire:poll.5s>
+<div wire:poll.5s="$unless($mostrarModal)">
     <div class="flex flex-col-reverse lg:flex-row h-[calc(100vh-2rem)] lg:h-full gap-4">
         {{-- Panel Izquierdo - Lista de Envíos --}}
         <div id="shipment-panel" class="w-full lg:w-[420px] glass-card rounded-2xl flex flex-col overflow-hidden h-[40vh] max-h-[40vh] lg:h-full lg:max-h-full transition-all duration-300 ease-out">
@@ -225,10 +225,19 @@
                                 wire:model="foto_entrega"
                                 accept="image/*"
                                 capture="environment"
-                                class="w-full px-4 py-2 glass-subtle rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50">
+                                @disabled($subiendo)
+                                class="w-full px-4 py-2 glass-subtle rounded-xl text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:opacity-50 disabled:cursor-not-allowed">
                             @error('foto_entrega') 
                                 <span class="text-danger text-xs mt-1">{{ $message }}</span> 
                             @enderror
+                            
+                            {{-- Indicador de carga durante la subida --}}
+                            <div wire:loading wire:target="foto_entrega" class="mt-2 flex items-center gap-2 text-sm text-foreground-muted">
+                                <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                </svg>
+                                Subiendo imagen...
+                            </div>
 
                             @if ($foto_entrega)
                                 <div class="mt-3">
@@ -258,13 +267,22 @@
                             <button 
                                 type="button"
                                 wire:click="cerrarModal"
-                                class="flex-1 glass-subtle text-foreground px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all">
+                                @disabled($subiendo)
+                                class="flex-1 glass-subtle text-foreground px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed">
                                 Cancelar
                             </button>
                             <button 
                                 type="submit"
-                                class="flex-1 {{ $nuevoEstado === 'entregado' ? 'glass-green text-success' : 'glass-red text-danger' }} px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all">
-                                Confirmar
+                                @disabled($subiendo)
+                                class="flex-1 {{ $nuevoEstado === 'entregado' ? 'glass-green text-success' : 'glass-red text-danger' }} px-4 py-2 rounded-xl font-medium hover:shadow-md transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                                @if($subiendo)
+                                    <svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                                    </svg>
+                                    Guardando...
+                                @else
+                                    Confirmar
+                                @endif
                             </button>
                         </div>
                     </form>
@@ -296,9 +314,11 @@
          class="fixed top-4 right-4 z-[9999] glass glass-strong rounded-xl p-4 shadow-2xl max-w-sm"
          style="display: none;">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg glass glass-green flex items-center justify-center">
-                <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+            <div class="w-10 h-10 rounded-lg flex items-center justify-center" 
+                 :class="tipo === 'success' ? 'glass glass-green' : 'glass glass-red'">
+                <svg class="w-5 h-5" :class="tipo === 'success' ? 'text-success' : 'text-danger'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path x-show="tipo === 'success'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    <path x-show="tipo === 'error'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </div>
             <p class="font-semibold text-foreground" x-text="mensaje"></p>
