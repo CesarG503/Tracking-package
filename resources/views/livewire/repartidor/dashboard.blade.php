@@ -306,7 +306,8 @@
                                     $estilo = $estilos[$tipo] ?? $estilos['disponible'];
                                 @endphp
                                 
-                                <div class="flex items-center justify-between p-2 rounded-lg {{ $esHoy ? 'glass glass-blue' : 'glass glass-subtle' }}" 
+                                <div wire:click="seleccionarDia('{{ $dia['fecha'] }}')" 
+                                    class="flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-surface transition-colors {{ $esHoy ? 'glass glass-blue' : 'glass glass-subtle' }}" 
                                     title="{{ $dia['descripcion'] }}">
                                     <div class="flex items-center gap-2">
                                         <span class="text-sm font-medium {{ $esHoy ? 'text-primary' : 'text-foreground' }}">
@@ -327,10 +328,61 @@
                             @endforelse
                         </div>
                         
-                        <a href="#" class="block text-center glass glass-subtle px-4 py-2 rounded-xl text-sm font-medium hover:shadow-md transition-all">
+                        <a href="{{ route('repartidor.calendario') }}" class="block text-center glass glass-subtle px-4 py-2 rounded-xl text-sm font-medium hover:shadow-md transition-all">
                             Ver mi calendarización
                         </a>
                     </div>
+                    
+                    {{-- Detalles del Día (Modal/Panel) --}}
+                    @if($diaSeleccionado)
+                        <div class="glass glass-strong rounded-2xl p-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                            <h3 class="text-lg font-semibold text-foreground mb-4">Detalles del Día</h3>
+                            
+                            <div class="space-y-4">
+                                <div>
+                                    <p class="text-sm text-foreground-muted">Fecha</p>
+                                    <p class="text-lg font-bold text-foreground capitalize">{{ $diaSeleccionado['fecha'] }}</p>
+                                </div>
+
+                                <div>
+                                    <p class="text-sm text-foreground-muted">Horario</p>
+                                    <p class="text-foreground font-medium">{{ $diaSeleccionado['horario'] }}</p>
+                                </div>
+
+                                <div>
+                                    <p class="text-sm text-foreground-muted">Estado</p>
+                                    <span class="inline-block mt-1 px-3 py-1 rounded-lg text-sm font-semibold capitalize
+                                        {{ $diaSeleccionado['tipo'] === 'disponible' ? 'glass glass-green text-success' : '' }}
+                                        {{ $diaSeleccionado['tipo'] === 'ocupado' ? 'glass glass-red text-danger' : '' }}
+                                        {{ $diaSeleccionado['tipo'] === 'vacaciones' ? 'glass glass-amber text-warning' : '' }}
+                                        {{ $diaSeleccionado['tipo'] === 'bloqueo' ? 'glass glass-gray text-foreground' : '' }}">
+                                        {{ $diaSeleccionado['tipo'] }}
+                                    </span>
+                                </div>
+
+                                @if($diaSeleccionado['vehiculo'])
+                                    <div class="glass glass-subtle rounded-xl p-3">
+                                        <p class="text-sm text-foreground-muted mb-2">Vehículo Asignado</p>
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 rounded-lg glass glass-blue flex items-center justify-center">
+                                                <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+                                                </svg>
+                                            </div>
+                                            <div>
+                                                <p class="font-semibold text-foreground text-sm">{{ $diaSeleccionado['vehiculo']['marca'] }} {{ $diaSeleccionado['vehiculo']['modelo'] }}</p>
+                                                <p class="text-xs text-foreground-muted font-mono">{{ $diaSeleccionado['vehiculo']['placa'] }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @endif
+                                
+                                <button wire:click="cerrarDetalle" class="w-full glass glass-subtle py-2 rounded-xl text-sm font-medium hover:bg-surface transition-colors">
+                                    Cerrar
+                                </button>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

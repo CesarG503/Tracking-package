@@ -75,6 +75,8 @@ class Dashboard extends Component
             ->get();
     }
 
+    public $diaSeleccionado = null;
+
     // Calendario semanal
     #[Computed]
     public function diasSemana()
@@ -102,7 +104,7 @@ class Dashboard extends Component
             });
             
             $dias[] = [
-                'fecha' => $fecha,
+                'fecha' => $fecha->format('Y-m-d'),
                 'dia_nombre' => $fecha->locale('es')->translatedFormat('D'),
                 'dia_numero' => $fecha->format('d'),
                 'tipo' => $evento ? $evento->tipo : 'disponible',
@@ -112,6 +114,43 @@ class Dashboard extends Component
         }
 
         return $dias;
+    }
+
+    public function seleccionarDia($fecha)
+    {
+        // Buscar evento para ese día
+        $repartidor = Auth::user();
+        $fechaCarbon = \Carbon\Carbon::parse($fecha);
+        
+        $evento = $repartidor->disponibilidades()
+            ->where(function($query) use ($fechaCarbon) {
+                $query->where('fecha_inicio', '<=', $fechaCarbon->endOfDay())
+                      ->where('fecha_fin', '>=', $fechaCarbon->startOfDay());
+            })
+            ->first();
+            
+        // Buscar vehículo asignado para ese día
+        $vehiculoAsignacion = $repartidor->vehiculoAsignaciones()
+            ->where('estado', 'activo')
+            ->where('fecha_inicio', '<=', $fechaCarbon->endOfDay())
+            ->where('fecha_fin', '>=', $fechaCarbon->startOfDay())
+            ->with('vehiculo')
+            ->first();
+
+        $this->diaSeleccionado = [
+            'fecha' => $fechaCarbon->locale('es')->translatedFormat('l, d \d\e F \d\e Y'),
+            'tipo' => $evento ? $evento->tipo : 'disponible',
+            'descripcion' => $evento ? $evento->descripcion : 'Sin descripción',
+            'vehiculo' => $vehiculoAsignacion ? $vehiculoAsignacion->vehiculo : null,
+            'horario' => $evento ? 
+                \Carbon\Carbon::parse($evento->fecha_inicio)->format('H:i') . ' - ' . \Carbon\Carbon::parse($evento->fecha_fin)->format('H:i') 
+                : '08:00 - 17:00 (Por defecto)'
+        ];
+    }
+    
+    public function cerrarDetalle()
+    {
+        $this->diaSeleccionado = null;
     }
 
 
