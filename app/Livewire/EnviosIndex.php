@@ -15,11 +15,14 @@ class EnviosIndex extends Component
     public $perPage = 10;
     public $sortBy = 'created_at';
     public $sortDirection = 'desc';
+    public $activeTimeTab = 'hoy'; // hoy, semana, todos
+    public $showFilters = false;
 
     protected $queryString = [
         'search' => ['except' => ''],
         'filterEstado' => ['except' => ''],
         'perPage' => ['except' => 10],
+        'activeTimeTab' => ['except' => 'hoy'],
     ];
 
     public function updatingSearch()
@@ -54,6 +57,22 @@ class EnviosIndex extends Component
         $this->resetPage();
     }
 
+    public function setTimeTab($tab)
+    {
+        $this->activeTimeTab = $tab;
+        $this->resetPage();
+    }
+
+    public function toggleFilters()
+    {
+        $this->showFilters = !$this->showFilters;
+    }
+
+    public function updatingActiveTimeTab()
+    {
+        $this->resetPage();
+    }
+
     public function cancelEnvio($envioId)
     {
         $envio = Envio::find($envioId);
@@ -68,6 +87,15 @@ class EnviosIndex extends Component
     {
         return Envio::query()
             ->with(['repartidor', 'vehiculoAsignacion.vehiculo'])
+            ->when($this->activeTimeTab === 'hoy', function ($query) {
+                $query->whereDate('created_at', today());
+            })
+            ->when($this->activeTimeTab === 'semana', function ($query) {
+                $query->whereBetween('created_at', [
+                    now()->startOfWeek(),
+                    now()->endOfWeek()
+                ]);
+            })
             ->when($this->search, function ($query) {
                 $query->where(function ($subQuery) {
                     $subQuery->where('remitente_nombre', 'like', '%' . $this->search . '%')

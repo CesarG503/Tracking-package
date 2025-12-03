@@ -29,10 +29,24 @@ class MisEnvios extends Component
     public $nuevoEstado = '';
     public $foto_entrega = null;
     public $observaciones = '';
+    public $subiendo = false;
 
-    protected $rules = [
-        'foto_entrega' => 'nullable|image|max:2048',
-        'observaciones' => 'nullable|string|max:500'
+    protected function rules()
+    {
+        return [
+            'foto_entrega' => $this->nuevoEstado === 'entregado' 
+                ? 'required|image|max:2048|mimes:jpeg,png,jpg,gif' 
+                : 'nullable|image|max:2048|mimes:jpeg,png,jpg,gif',
+            'observaciones' => 'nullable|string|max:500'
+        ];
+    }
+
+    protected $messages = [
+        'foto_entrega.required' => 'La foto de entrega es obligatoria para confirmar la entrega.',
+        'foto_entrega.image' => 'El archivo debe ser una imagen válida.',
+        'foto_entrega.max' => 'La imagen no debe pesar más de 2MB.',
+        'foto_entrega.mimes' => 'La imagen debe ser de tipo: jpeg, png, jpg o gif.',
+        'observaciones.max' => 'Las observaciones no pueden exceder los 500 caracteres.'
     ];
 
     public function updatingBusqueda()
@@ -109,6 +123,7 @@ class MisEnvios extends Component
         $this->nuevoEstado = '';
         $this->foto_entrega = null;
         $this->observaciones = '';
+        $this->subiendo = false;
         $this->resetValidation();
     }
 
@@ -117,29 +132,60 @@ class MisEnvios extends Component
         $this->validate();
 
         if (!$this->envioSeleccionado) {
+            $this->dispatch('envio-actualizado', [
+                'mensaje' => 'Envío no encontrado',
+                'tipo' => 'error'
+            ]);
             return;
         }
 
-        $datosActualizar = [
-            'estado' => $this->nuevoEstado,
-            'observaciones' => $this->observaciones
-        ];
+        $this->subiendo = true;
 
-        // Guardar foto si existe
-        if ($this->foto_entrega) {
-            $nombreArchivo = 'entrega_' . $this->envioSeleccionado->id . '_' . time() . '.' . $this->foto_entrega->extension();
-            $rutaFoto = $this->foto_entrega->storeAs('entregas', $nombreArchivo, 'public');
-            $datosActualizar['foto_entrega'] = $rutaFoto;
+        try {
+            $datosActualizar = [
+                'estado' => $this->nuevoEstado,
+                'observaciones' => $this->observaciones
+            ];
+
+            // Guardar foto si existe
+            if ($this->foto_entrega) {
+                // Crear un nombre único para la imagen
+                $nombreArchivo = 'entrega_' . $this->envioSeleccionado->id . '_' . time() . '.' . $this->foto_entrega->extension();
+                
+                // Almacenar la imagen en storage/app/public/entregas
+                $rutaFoto = $this->foto_entrega->storeAs('entregas', $nombreArchivo, 'public');
+                
+                // Guardar la ruta en la base de datos
+                $datosActualizar['foto_entrega'] = $rutaFoto;
+                
+                // Eliminar foto anterior si existe
+                if ($this->envioSeleccionado->foto_entrega && Storage::disk('public')->exists($this->envioSeleccionado->foto_entrega)) {
+                    Storage::disk('public')->delete($this->envioSeleccionado->foto_entrega);
+                }
+            }
+
+            // Actualizar el envío en la base de datos
+            $this->envioSeleccionado->update($datosActualizar);
+
+            $this->dispatch('envio-actualizado', [
+                'mensaje' => 'Estado y foto de entrega actualizados correctamente',
+                'tipo' => 'success'
+            ]);
+
+            $this->cerrarModal();
+            
+            // Refrescar las propiedades computadas
+            $this->resetPage();
+            unset($this->enviosHoy, $this->estadisticas);
+            
+        } catch (\Exception $e) {
+            $this->dispatch('envio-actualizado', [
+                'mensaje' => 'Error al actualizar el envío: ' . $e->getMessage(),
+                'tipo' => 'error'
+            ]);
+        } finally {
+            $this->subiendo = false;
         }
-
-        $this->envioSeleccionado->update($datosActualizar);
-
-        $this->dispatch('envio-actualizado', [
-            'mensaje' => 'Estado actualizado correctamente',
-            'tipo' => 'success'
-        ]);
-
-        $this->cerrarModal();
     }
 
     public function cambiarEstado($envioId, $nuevoEstado)
@@ -155,6 +201,9 @@ class MisEnvios extends Component
                     'mensaje' => 'Estado actualizado correctamente',
                     'tipo' => 'success'
                 ]);
+                
+                // Refrescar las propiedades computadas
+                unset($this->enviosHoy, $this->estadisticas);
             }
         } else {
             $this->abrirModalEstado($envioId, $nuevoEstado);

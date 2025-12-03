@@ -49,7 +49,7 @@ class EnvioController extends Controller
         $fechaHoraCarbon = \Carbon\Carbon::parse($fechaHora);
 
         // Debug: Log para verificar qué fecha y hora se está usando para disponibilidad
-        Log::info('Buscando recursos para fecha: ' . $fecha . ' a las ' . $hora);
+        //Log::info('Buscando recursos para fecha: ' . $fecha . ' a las ' . $hora);
 
         // Obtener todas las asignaciones activas (sin filtro de fecha primero)
         $todasAsignaciones = VehiculoAsignacion::with(['vehiculo', 'repartidor'])

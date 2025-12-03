@@ -80,12 +80,12 @@
                             #{{ $envio->codigo }}
                         </p>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-col items-center gap-2">
                         <span class="status-badge px-3 py-1 rounded-full text-xs font-medium bg-warning-light dark:bg-warning-light text-warning dark:text-warning">
                             En Ruta
                         </span>
                         @if(!$envio->repartidor)
-                            <span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-surface-secondary text-foreground-muted">
+                            <span class="px-2 py-1 rounded-full text-xs font-medium bg-danger-light text-danger dark:text-foreground/75">
                                 Sin asignar
                             </span>
                         @endif
@@ -94,8 +94,10 @@
                 <div id="details-envio-{{ $envio->id }}" class="mt-3 hidden">
                     @if($envio->repartidor)
                     <div class="flex items-center gap-3 mb-3">
-                        <div class="w-10 h-10 rounded-full bg-surface-secondary overflow-hidden">
-                            <img src="/placeholder.svg?height=40&width=40" alt="Courier" class="w-full h-full object-cover">
+                        <div class="w-10 h-10 rounded-full bg-surface-secondary flex items-center justify-center">
+                            <svg class="w-6 h-6 text-foreground-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
                         </div>
                         <div class="flex-1">
                             <p class="font-medium text-foreground">{{ $envio->repartidor->nombre }}</p>
@@ -196,18 +198,31 @@
         <!-- Lista Entregados -->
         <div class="space-y-3 {{ $activeTab !== 'entregado' ? 'hidden' : '' }}">
             @forelse($enviosEntregados as $envio)
-            <div class="glass-card rounded-2xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 envio-card" data-target="details-entregado-{{ $envio->id }}">
-                <div class="flex items-center justify-between mb-3">
+            <div class="glass-card rounded-2xl p-4 cursor-pointer hover:shadow-lg transition-all duration-200 envio-card relative" data-target="details-entregado-{{ $envio->id }}">
+                <!-- Vista previa en la esquina superior derecha -->
+                <a 
+                    href="{{ route('envios.show', $envio->id) }}" 
+                    class="absolute top-3 right-3 p-2 rounded-full bg-surface-secondary hover:bg-primary hover:text-white text-foreground-muted transition-all duration-200 shadow-sm hover:shadow-md z-10"
+                    title="Ver detalles del envío">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 616 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                </a>
+                
+                <div class="flex items-center justify-between mb-3 pr-10">
                     <div>
                         <h3 class="font-semibold text-foreground">
                             {{ Str::limit($envio->remitente_direccion, 15) }} → {{ Str::limit($envio->destinatario_direccion, 15) }}
                         </h3>
-                        <p class="text-sm text-foreground-muted">Order ID #{{ str_pad($envio->id, 5, '0', STR_PAD_LEFT) }}-{{ rand(10000,99999) }}</p>
+                        <p class="text-sm text-foreground-muted">#{{ $envio->codigo }}</p>
                     </div>
-                    <div class="flex items-center gap-2">
+                    <div class="flex flex-col items-center gap-2">
+                                            <div class="flex flex-col items-center">
                         <span class="status-badge px-3 py-1 rounded-full text-xs font-medium bg-success-light text-success">
                             Entregado
                         </span>
+                    </div>
                     </div>
                 </div>
                 
