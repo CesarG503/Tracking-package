@@ -54,5 +54,9 @@ Route::middleware(['auth', 'repartidor'])->group(function () {
         return view('repartidor.calendario');
     })->name('repartidor.calendario');
 
+    Route::get('/mi-perfil', function() {
+        return view('repartidor.mi-perfil');
+    })->name('mi-perfil');
+
 });
 
