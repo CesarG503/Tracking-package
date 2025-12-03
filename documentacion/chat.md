@@ -136,3 +136,17 @@ La vista de seguimiento es un componente Livewire dinámico que integra varias f
 *   **Línea de Tiempo (Timeline)**:
     *   Recorre los registros de la tabla `historial_envios` para mostrar una lista cronológica de todos los eventos por los que ha pasado el paquete.
 
+4.  **Estado de Lectura (`visto`)**:
+    *   **Propósito**: Indicar si un mensaje ha sido leído por el destinatario correspondiente (Cliente o Repartidor/Admin).
+    *   **Backend (Base de Datos)**:
+        *   Se añadió una columna `leido` (tipo `boolean`, default `false`) a la tabla `mensajes`.
+        *   Esta columna actúa como bandera: `0` (No leído), `1` (Leído).
+    *   **Lógica de Negocio (Livewire)**:
+        *   **En `TrackingEnvio` (Vista del Cliente/Admin)**:
+            *   Al cargar el componente (`mount`), si el usuario autenticado es Repartidor o Admin, el sistema busca todos los mensajes del cliente (`es_repartidor = false`) que no han sido leídos (`leido = false`) y los marca como leídos (`leido = true`).
+        *   **En `MisEnvios` (Panel del Repartidor)**:
+            *   Se calcula un conteo de mensajes no leídos (`mensajes_cliente_count`) para cada envío.
+            *   Esto filtra mensajes donde `es_repartidor = false` y `leido = false`.
+    *   **Frontend (Visualización)**:
+        *   En la lista de envíos del repartidor, se muestra un **badge rojo** sobre el icono de mensajes si existen mensajes sin leer del cliente.
+        *   Esto alerta visualmente al repartidor de que hay nuevas consultas pendientes de atención.
