@@ -18,10 +18,12 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
 <script>
-let map;
+let rutaMap;
 let currentTileLayer = null;
-let mapInitialized = false;
-let marcadores = {}; // Objeto para almacenar los marcadores por ID
+let marcadoresEnvios = {}; 
+let marcadorEmpresa = null;
+
+const empresaCoords = [13.439624, -88.157400];
 
 const mapLayers = {
     light: {
@@ -34,35 +36,19 @@ const mapLayers = {
     }
 };
 
-// Iconos personalizados para diferentes estados
+// Iconos personalizados para cada estado
 const iconos = {
     pendiente: L.divIcon({
-        html: `<div class="relative">
-                <div class="w-8 h-8 bg-warning rounded-full border-4 border-white shadow-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11H9v-2h2v2zm0-4H9V5h2v4z"/>
-                    </svg>
-                </div>
-                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
-              </div>`,
-        className: 'custom-marker',
-        iconSize: [32, 40],
-        iconAnchor: [16, 40],
-        popupAnchor: [0, -40]
+        html: '<div class="w-8 h-8 rounded-full bg-warning shadow-lg flex items-center justify-center text-white font-bold border-2 border-white">📦</div>',
+        className: 'custom-div-icon',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
     }),
     en_ruta: L.divIcon({
-        html: `<div class="relative">
-                <div class="w-8 h-8 bg-primary rounded-full border-4 border-white shadow-lg flex items-center justify-center animate-pulse">
-                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm-1 13l-4-4 1.5-1.5L9 12l4.5-4.5L15 9l-6 6z"/>
-                    </svg>
-                </div>
-                <div class="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-white"></div>
-              </div>`,
-        className: 'custom-marker',
-        iconSize: [32, 40],
-        iconAnchor: [16, 40],
-        popupAnchor: [0, -40]
+        html: '<div class="w-8 h-8 rounded-full bg-primary shadow-lg flex items-center justify-center text-white font-bold border-2 border-white">🚚</div>',
+        className: 'custom-div-icon',
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
     })
 };
 
@@ -71,55 +57,135 @@ function getCurrentTheme() {
 }
 
 function updateMapTheme(theme = getCurrentTheme()) {
-    if (!map || !currentTileLayer) return;
-    map.removeLayer(currentTileLayer);
+    if (!rutaMap || !currentTileLayer) return;
+    rutaMap.removeLayer(currentTileLayer);
     const layerConfig = mapLayers[theme];
     currentTileLayer = L.tileLayer(layerConfig.url, {
         attribution: layerConfig.attribution,
         maxZoom: 19,
-    }).addTo(map);
+    }).addTo(rutaMap);
 }
 
 function centerMap() {
-    const empresaLat = {{ $empresaCoordenadas['lat'] }};
-    const empresaLng = {{ $empresaCoordenadas['lng'] }};
-
-    if (map) {
-        map.setView([empresaLat, empresaLng], 13);
+    if (rutaMap) {
+        rutaMap.setView(empresaCoords, 13);
     }
 }
 
-function initializeMap() {
-    // Coordenadas de la empresa
-    const empresaLat = {{ $empresaCoordenadas['lat'] }};
-    const empresaLng = {{ $empresaCoordenadas['lng'] }};
-
-    console.log('Empresa coords:', empresaLat, empresaLng);
-
-    if (mapInitialized) {
-        console.log('Map already initialized');
-        return;
-    }
-
-    const mapContainer = document.getElementById('ruta-map');
-    if (!mapContainer) {
-        console.error('Map container not found');
-        return;
-    }
-
-    mapContainer.innerHTML = '';
+function ajustarVistaATodosLosMarcadores() {
+    if (!rutaMap) return;
     
-    map = L.map('ruta-map').setView([empresaLat, empresaLng], 13);
+    const marcadores = Object.values(marcadoresEnvios);
+    if (marcadores.length === 0) {
+        centerMap();
+        return;
+    }
+    
+    const group = L.featureGroup([marcadorEmpresa, ...marcadores]);
+    rutaMap.fitBounds(group.getBounds().pad(0.1));
+}
+
+function cargarMarcadoresIniciales(envios) {
+    console.log('Cargando marcadores iniciales:', envios);
+    
+    if (!rutaMap) {
+        console.error('Mapa no inicializado');
+        return;
+    }
+    
+    // Limpiar marcadores existentes
+    Object.values(marcadoresEnvios).forEach(marker => rutaMap.removeLayer(marker));
+    marcadoresEnvios = {};
+    
+    // Agregar nuevos marcadores
+    envios.forEach(envio => {
+        agregarMarcador(envio);
+    });
+    
+    actualizarEstadisticasMapa(envios);
+    ajustarVistaATodosLosMarcadores();
+}
+
+function agregarMarcador(envio) {
+    if (!rutaMap || !envio.lat || !envio.lng) return;
+    
+    console.log('Agregando marcador:', envio);
+    
+    const icono = iconos[envio.estado] || iconos.pendiente;
+    const marker = L.marker([envio.lat, envio.lng], { icon: icono })
+        .addTo(rutaMap);
+    
+    marker.bindPopup(`
+        <div class="p-3">
+            <h3 class="font-bold text-foreground mb-2">Envío ${envio.codigo || envio.id}</h3>
+            <div class="space-y-1 text-sm">
+                <p class="text-foreground"><strong>Cliente:</strong> ${envio.destinatario}</p>
+                <p class="text-foreground-muted">${envio.direccion}</p>
+                ${envio.telefono ? `<p class="text-foreground-muted">📞 ${envio.telefono}</p>` : ''}
+                <span class="inline-block mt-2 px-2 py-1 rounded text-xs font-semibold ${
+                    envio.estado === 'pendiente' ? 'bg-warning text-white' : 
+                    envio.estado === 'en_ruta' ? 'bg-primary text-white' : 'bg-gray-500 text-white'
+                }">
+                    ${envio.estado === 'pendiente' ? 'Pendiente' : envio.estado === 'en_ruta' ? 'En Ruta' : envio.estado}
+                </span>
+            </div>
+        </div>
+    `);
+    
+    marcadoresEnvios[envio.id] = marker;
+}
+
+function eliminarMarcador(envioId) {
+    console.log('Eliminando marcador:', envioId);
+    
+    if (marcadoresEnvios[envioId]) {
+        rutaMap.removeLayer(marcadoresEnvios[envioId]);
+        delete marcadoresEnvios[envioId];
+    }
+}
+
+function actualizarMarcador(envio) {
+    console.log('Actualizando marcador:', envio);
+    
+    // Eliminar marcador antiguo y crear uno nuevo con el estado actualizado
+    eliminarMarcador(envio.id);
+    agregarMarcador(envio);
+}
+
+function actualizarEstadisticasMapa(envios) {
+    const pendientes = envios.filter(e => e.estado === 'pendiente').length;
+    const enRuta = envios.filter(e => e.estado === 'en_ruta').length;
+    const total = envios.length;
+    
+    document.getElementById('map-stats-pendientes').textContent = pendientes;
+    document.getElementById('map-stats-enruta').textContent = enRuta;
+    document.getElementById('map-stats-total').textContent = total;
+}
+
+// Inicializar mapa
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Inicializando mapa de rutas...');
+    
+    rutaMap = L.map('ruta-map').setView(empresaCoords, 13);
     
     const currentTheme = getCurrentTheme();
     const layerConfig = mapLayers[currentTheme];
     currentTileLayer = L.tileLayer(layerConfig.url, {
         attribution: layerConfig.attribution,
         maxZoom: 19,
-    }).addTo(map);
+    }).addTo(rutaMap);
     
-    mapInitialized = true;
+    // Marcador de la empresa
+    marcadorEmpresa = L.marker(empresaCoords)
+        .addTo(rutaMap)
+        .bindPopup(`
+            <div class="text-center p-2">
+                <h3 class="font-bold text-lg mb-1">TrackFlow</h3>
+                <p class="text-sm text-gray-600">Centro de Distribución</p>
+            </div>
+        `);
     
+    // Observer para cambios de tema
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
             if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
@@ -137,224 +203,84 @@ function initializeMap() {
         updateMapTheme(event.detail.theme);
     });
 
-
-    // Marcador de la empresa (icono por defecto)
-    companyMarker = L.marker([empresaLat, empresaLng])
-        .addTo(map) 
-        .bindPopup(`
-            <div class="text-center">
-                <h3 class="font-bold text-lg mb-1">TrackFlow</h3>
-                <p class="text-sm text-gray-600">Centro de Distribución</p>
-            </div>
-        `);
-
-
     setTimeout(() => {
-        map.invalidateSize();
+        rutaMap.invalidateSize();
     }, 100);
-}
-
-// Cargar marcadores iniciales
-function cargarMarcadoresIniciales(envios) {
-    if (!map) {
-        console.error('Map not initialized');
-        return;
-    }
-
-    // Limpiar marcadores existentes
-    Object.values(marcadores).forEach(marker => marker.remove());
-    marcadores = {};
-
-    // Agregar nuevos marcadores
-    envios.forEach(envio => {
-        agregarMarcador(envio);
-    });
-
-    // Ajustar vista si hay marcadores
-    if (envios.length > 0) {
-        ajustarVistaATodosLosMarcadores();
-    }
-
-    // Actualizar stats
-    actualizarStatsMap();
-}
-
-// Agregar o actualizar un marcador
-function agregarMarcador(envio) {
-    if (!map) return;
-
-    const { id, lat, lng, estado, destinatario, direccion, telefono } = envio;
-
-    // Si el marcador ya existe, eliminarlo primero
-    if (marcadores[id]) {
-        marcadores[id].remove();
-    }
-
-    // Crear nuevo marcador
-    const icono = iconos[estado] || iconos.pendiente;
-    const marker = L.marker([lat, lng], { icon: icono }).addTo(map);
-
-    // Crear popup
-    const estadoTexto = estado === 'pendiente' ? 'Pendiente' : 'En Ruta';
-    const estadoColor = estado === 'pendiente' ? 'warning' : 'primary';
     
-    const popupContent = `
-        <div class="p-2 min-w-[200px]">
-            <div class="flex items-center justify-between mb-2">
-                <h3 class="font-bold text-foreground">Envío #${id}</h3>
-                <span class="glass glass-${estadoColor} glass-subtle px-2 py-0.5 rounded text-xs font-semibold">
-                    ${estadoTexto}
-                </span>
-            </div>
-            <div class="space-y-1 text-sm">
-                <p class="text-foreground"><strong>Destinatario:</strong> ${destinatario}</p>
-                <p class="text-foreground-muted"><strong>Dirección:</strong> ${direccion}</p>
-                ${telefono ? `<p class="text-foreground-muted"><strong>Teléfono:</strong> ${telefono}</p>` : ''}
-            </div>
-            <div class="mt-3 flex gap-2">
-                <button onclick="verDetalleEnvio(${id})" class="flex-1 glass glass-blue px-3 py-1.5 rounded-lg text-xs font-medium hover:shadow-md transition-all">
-                    Ver detalles
-                </button>
-                <button onclick="iniciarNavegacion(${lat}, ${lng})" class="flex-1 glass glass-green px-3 py-1.5 rounded-lg text-xs font-medium hover:shadow-md transition-all">
-                    Navegar
-                </button>
-            </div>
-        </div>
-    `;
+    console.log('Mapa inicializado correctamente');
+});
 
-    marker.bindPopup(popupContent, {
-        maxWidth: 300,
-        className: 'custom-popup'
-    });
-
-    // Guardar marcador
-    marcadores[id] = marker;
-
-    // Actualizar stats
-    actualizarStatsMap();
-}
-
-// Eliminar un marcador
-function eliminarMarcador(envioId) {
-    if (marcadores[envioId]) {
-        marcadores[envioId].remove();
-        delete marcadores[envioId];
-        actualizarStatsMap();
-    }
-}
-
-// Ajustar vista para mostrar todos los marcadores
-function ajustarVistaATodosLosMarcadores() {
-    if (!map || Object.keys(marcadores).length === 0) return;
-
-    const bounds = L.latLngBounds(
-        Object.values(marcadores).map(marker => marker.getLatLng())
-    );
-    
-    map.fitBounds(bounds, { padding: [50, 50] });
-}
-
-// Actualizar estadísticas del mapa
-function actualizarStatsMap() {
-    const keys = Object.keys(marcadores);
-    const total = keys.length;
-    
-    let pendientes = 0;
-    let enRuta = 0;
-    
-    // Contar por estado
-    keys.forEach(id => {
-        const marker = marcadores[id];
-    });
-
-    document.getElementById('map-stats-total').textContent = total;
-    document.getElementById('map-stats-pendientes').textContent = pendientes;
-    document.getElementById('map-stats-enruta').textContent = enRuta;
-}
-
-// Funciones auxiliares
-function verDetalleEnvio(envioId) {
-    window.location.href = `/repartidor/envios/${envioId}`;
-}
-
-function iniciarNavegacion(lat, lng) {
-    // Abrir en Google Maps o la app de mapas predeterminada
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}`;
-    window.open(url, '_blank');
-}
-
-// Escuchar eventos de Livewire para actualizar marcadores
+// Escuchar eventos de Livewire
 document.addEventListener('livewire:initialized', () => {
-    // Actualizar marcador
-    Livewire.on('actualizar-marcador-mapa', (event) => {
-        const data = event[0] || event;
-        console.log('Actualizando marcador:', data);
-        agregarMarcador(data);
+    console.log('Livewire initialized - escuchando eventos del mapa...');
+    
+    // Nuevo envío asignado
+    Livewire.on('nuevo-envio-mapa', (event) => {
+        console.log('Nuevo envío detectado:', event);
+        const envio = Array.isArray(event) ? event[0] : event;
+        agregarMarcador(envio);
         
-        // Animar hacia el nuevo marcador
-        if (data.accion === 'nuevo') {
-            map.setView([data.lat, data.lng], 15, {
-                animate: true,
-                duration: 1
-            });
-            
-            // Abrir popup automáticamente
-            setTimeout(() => {
-                if (marcadores[data.id]) {
-                    marcadores[data.id].openPopup();
-                }
-            }, 500);
-        }
+        // Actualizar estadísticas
+        const enviosActuales = Object.values(marcadoresEnvios).map(m => ({
+            estado: m._icon.querySelector('.bg-warning') ? 'pendiente' : 'en_ruta'
+        }));
+        actualizarEstadisticasMapa([...enviosActuales, envio]);
+        
+        // Notificación visual
+        mostrarNotificacion('Nuevo envío asignado', 'success');
     });
-
-    // Eliminar marcador
-    Livewire.on('eliminar-marcador-mapa', (event) => {
-        const data = event[0] || event;
-        console.log('Eliminando marcador:', data.id);
+    
+    // Envío eliminado (entregado, cancelado, etc)
+    Livewire.on('eliminar-envio-mapa', (event) => {
+        console.log('Envío eliminado:', event);
+        const data = Array.isArray(event) ? event[0] : event;
         eliminarMarcador(data.id);
+        
+        mostrarNotificacion('Envío actualizado', 'info');
+    });
+    
+    // Estado actualizado
+    Livewire.on('actualizar-estado-envio-mapa', (event) => {
+        console.log('Estado actualizado:', event);
+        const envio = Array.isArray(event) ? event[0] : event;
+        actualizarMarcador(envio);
+        
+        mostrarNotificacion(`Envío #${envio.codigo || envio.id} → ${envio.estado}`, 'info');
     });
 });
 
-// Inicializar
-document.addEventListener('DOMContentLoaded', initializeMap);
-document.addEventListener('livewire:navigated', initializeMap);
+// Función para mostrar notificaciones
+function mostrarNotificacion(mensaje, tipo = 'info') {
+    const colores = {
+        success: 'bg-success',
+        info: 'bg-primary',
+        warning: 'bg-warning',
+        error: 'bg-danger'
+    };
+    
+    const notif = document.createElement('div');
+    notif.className = `fixed top-4 right-4 z-[9999] ${colores[tipo]} text-white px-4 py-3 rounded-xl shadow-lg animate-in fade-in slide-in-from-right-4 duration-300`;
+    notif.innerHTML = `
+        <div class="flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span class="font-medium">${mensaje}</span>
+        </div>
+    `;
+    
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.remove();
+    }, 3000);
+}
 
 window.addEventListener('resize', () => {
-    if (map) {
-        map.invalidateSize();
+    if (rutaMap) {
+        rutaMap.invalidateSize();
     }
 });
 </script>
-
-<style>
-.custom-marker {
-    background: transparent;
-    border: none;
-}
-
-.custom-popup .leaflet-popup-content-wrapper {
-    background: var(--glass-bg, rgba(255, 255, 255, 0.9));
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.custom-popup .leaflet-popup-tip {
-    background: var(--glass-bg, rgba(255, 255, 255, 0.9));
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-    }
-    50% {
-        transform: scale(1.1);
-    }
-}
-
-.animate-pulse {
-    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-</style>
 @endpush
 @endsection
