@@ -17,6 +17,12 @@ class MisEnvios extends Component
     public $busqueda = '';
     public $estadoSeleccionado = 'todos';
     
+    // Coordenadas de la empresa
+    public $empresaCoordenadas = [
+        'lat' => 13.439624,
+        'lng' => -88.157400
+    ];
+    
     // Modal para actualizar estado
     public $mostrarModal = false;
     public $envioSeleccionado = null;

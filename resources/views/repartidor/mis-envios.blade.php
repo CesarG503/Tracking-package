@@ -9,7 +9,7 @@
     @include('partials.sidebar-repartidor')
 
     {{-- Main Content --}}
-    <main class="flex-1 p-4 lg:p-6 overflow-auto bg-background">
+    <main class="flex-1 overflow-auto bg-background">
         <livewire:repartidor.mis-envios />
     </main>
 </div>

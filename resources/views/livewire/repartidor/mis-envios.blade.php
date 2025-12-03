@@ -1,10 +1,10 @@
 {{-- resources/views/livewire/repartidor/mis-envios.blade.php --}}
 {{-- TODO: cambiar mejores estilos y evitar que se cierre al abrir la ventana
     de envios al estar en moviles --}}
-<div wire:poll.5s>
-    <div class="flex flex-col-reverse lg:flex-row h-[calc(100vh-2rem)] lg:h-full gap-4">
+<div wire:poll.5s class="flex h-screen overflow-hidden">
+    <div class="flex-1 flex flex-col-reverse lg:flex-row overflow-hidden">
         {{-- Panel Izquierdo - Lista de Envíos --}}
-        <div id="shipment-panel" class="w-full lg:w-[420px] glass-card rounded-2xl flex flex-col overflow-hidden h-[40vh] max-h-[40vh] lg:h-full lg:max-h-full transition-all duration-300 ease-out">
+        <div id="shipment-panel" class="w-full lg:w-[420px] glass-sidebar flex flex-col overflow-hidden h-[40vh] max-h-[40vh] lg:h-full lg:max-h-full transition-all duration-300 ease-out">
             {{-- Toggle para móvil --}}
             <button id="toggle-shipments" class="lg:hidden w-full flex items-center justify-center py-2 active:scale-95">
                 <div class="w-12 h-1 bg-foreground-muted/40 rounded-full"></div>
@@ -54,7 +54,7 @@
             {{-- Lista de Envíos --}}
             <div class="flex-1 overflow-y-auto p-4 space-y-3">
                 @forelse($this->enviosHoy as $envio)
-                    <div class="glass-subtle rounded-xl p-4 hover:shadow-md transition-all cursor-pointer"
+                    <div class="glass-subtle rounded-xl p-4 hover:shadow-md transition-all cursor-pointer border border-foreground/10 bg-gradient-to-r from-primary/5 to-transparent"
                          onclick="mostrarEnMapa({{ $envio->lat }}, {{ $envio->lng }}, '{{ addslashes($envio->destinatario_nombre) }}', '{{ addslashes($envio->destinatario_direccion) }}', {{ $envio->id }})">
                         
                         {{-- Header del Envío --}}
@@ -188,7 +188,7 @@
         </div>
 
         {{-- Panel Derecho - Mapa --}}
-        <div class="flex-1 glass-card rounded-2xl p-4 lg:p-6 h-[55vh] lg:h-auto">
+        <div class="flex-1 flex flex-col p-3 overflow-hidden">
             <div class="relative h-full rounded-xl overflow-hidden" wire:ignore>
                 <div id="mis-envios-map" class="w-full h-full rounded-xl"></div>
                 
@@ -307,8 +307,187 @@
 </div>
 
 <script>
-// Toggle del panel de envíos en móvil
+let mapMisEnvios;
+let routeLineMisEnvios;
+let companyMarkerMisEnvios;
+let destinationMarkerMisEnvios;
+let currentDestLatMisEnvios = null;
+let currentDestLngMisEnvios = null;
+let routingControlMisEnvios = null;
+let currentTileLayerMisEnvios = null;
+
+// Map tile layers for different themes
+const mapLayersMisEnvios = {
+    light: {
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    },
+    dark: {
+        url: 'https://tiles.stadiamaps.com/tiles/stamen_toner_dark/{z}/{x}/{y}{r}.png',
+        attribution: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>'
+    }
+};
+
+function getCurrentThemeMisEnvios() {
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+}
+
+function updateMapThemeMisEnvios(theme = getCurrentThemeMisEnvios()) {
+    if (!mapMisEnvios || !currentTileLayerMisEnvios) return;
+    
+    // Remove current layer
+    mapMisEnvios.removeLayer(currentTileLayerMisEnvios);
+    
+    // Add new layer based on theme
+    const layerConfig = mapLayersMisEnvios[theme];
+    currentTileLayerMisEnvios = L.tileLayer(layerConfig.url, {
+        attribution: layerConfig.attribution,
+        maxZoom: 19,
+    }).addTo(mapMisEnvios);
+}
+
+function initMapMisEnvios() {
+    // Coordenadas de la empresa
+    const empresaLat = {{ $empresaCoordenadas['lat'] }};
+    const empresaLng = {{ $empresaCoordenadas['lng'] }};
+    
+    console.log('Empresa coords (Mis Envíos):', empresaLat, empresaLng);
+    
+    // Inicializar el mapa centrado en la empresa
+    mapMisEnvios = L.map('mis-envios-map').setView([empresaLat, empresaLng], 13);
+    
+    // Agregar capa inicial basada en el tema actual
+    const currentTheme = getCurrentThemeMisEnvios();
+    const layerConfig = mapLayersMisEnvios[currentTheme];
+    currentTileLayerMisEnvios = L.tileLayer(layerConfig.url, {
+        attribution: layerConfig.attribution,
+        maxZoom: 19,
+    }).addTo(mapMisEnvios);
+    
+    // Listen for theme changes via MutationObserver
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                const newTheme = getCurrentThemeMisEnvios();
+                updateMapThemeMisEnvios(newTheme);
+            }
+        });
+    });
+    
+    observer.observe(document.documentElement, {
+        attributes: true,
+        attributeFilter: ['class']
+    });
+    
+    // Listen for custom theme change events
+    window.addEventListener('themeChanged', (event) => {
+        updateMapThemeMisEnvios(event.detail.theme);
+    });
+    
+    // Marcador de la empresa
+    companyMarkerMisEnvios = L.marker([empresaLat, empresaLng])
+        .addTo(mapMisEnvios)
+        .bindPopup(`
+            <div class="text-center">
+                <h3 class="font-bold text-lg mb-1">TrackFlow</h3>
+                <p class="text-sm text-gray-600">Centro de Distribución</p>
+            </div>
+        `);
+    
+    // Hacer el mapa responsive
+    setTimeout(() => {
+        mapMisEnvios.invalidateSize();
+    }, 100);
+}
+
+function centerMapMisEnvios() {
+    const empresaLat = {{ $empresaCoordenadas['lat'] }};
+    const empresaLng = {{ $empresaCoordenadas['lng'] }};
+    if (currentDestLatMisEnvios !== null && currentDestLngMisEnvios !== null) {
+        const bounds = L.latLngBounds([
+            [empresaLat, empresaLng],
+            [currentDestLatMisEnvios, currentDestLngMisEnvios]
+        ]);
+        mapMisEnvios.fitBounds(bounds, { padding: [50, 50] });
+    } else {
+        mapMisEnvios.setView([empresaLat, empresaLng], 13);
+    }
+}
+
+function mostrarEnMapa(lat, lng, nombre, direccion, envioId) {
+    if (!mapMisEnvios) return;
+
+    const empresaLat = {{ $empresaCoordenadas['lat'] }};
+    const empresaLng = {{ $empresaCoordenadas['lng'] }};
+
+    currentDestLatMisEnvios = lat;
+    currentDestLngMisEnvios = lng;
+
+    // Remover marcador de destino anterior si existe
+    if (destinationMarkerMisEnvios) {
+        mapMisEnvios.removeLayer(destinationMarkerMisEnvios);
+    }
+
+    // Agregar marcador de destino
+    destinationMarkerMisEnvios = L.marker([lat, lng])
+        .addTo(mapMisEnvios)
+        .bindPopup(`
+            <div class="text-center">
+                <h3 class="font-bold text-lg mb-1">${nombre}</h3>
+                <p class="text-sm text-gray-600">${direccion}</p>
+            </div>
+        `);
+
+    // Usar Leaflet Routing Machine con OSRM para mostrar la ruta
+    if (routingControlMisEnvios) {
+        routingControlMisEnvios.setWaypoints([
+            L.latLng(empresaLat, empresaLng),
+            L.latLng(lat, lng)
+        ]);
+    } else if (L.Routing && L.Routing.control) {
+        routingControlMisEnvios = L.Routing.control({
+            waypoints: [
+                L.latLng(empresaLat, empresaLng),
+                L.latLng(lat, lng)
+            ],
+            router: L.Routing.osrmv1({
+                serviceUrl: 'https://router.project-osrm.org/route/v1'
+            }),
+            lineOptions: {
+                styles: [
+                    { color: '#06b6d4', weight: 6, opacity: 0.8 },
+                    { color: '#22d3ee', weight: 3, opacity: 0.9 }
+                ]
+            },
+            showAlternatives: false,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            fitSelectedRoutes: true,
+            routeWhileDragging: false,
+            autoRoute: true,
+            language: 'es',
+            show: false
+        }).addTo(mapMisEnvios);
+    } else {
+        console.warn('Leaflet Routing Machine no cargó; usando línea directa como fallback.');
+        if (routeLineMisEnvios) {
+            mapMisEnvios.removeLayer(routeLineMisEnvios);
+            routeLineMisEnvios = null;
+        }
+        routeLineMisEnvios = L.polyline([
+            [empresaLat, empresaLng],
+            [lat, lng]
+        ], { color: '#06b6d4', weight: 4, opacity: 0.9 }).addTo(mapMisEnvios);
+        const bounds = L.latLngBounds([[empresaLat, empresaLng], [lat, lng]]);
+        mapMisEnvios.fitBounds(bounds, { padding: [50, 50] });
+    }
+}
+
+// Inicializar el mapa cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', () => {
+    initMapMisEnvios();
+    
+    // Toggle del panel de envíos en móvil
     const toggleBtn = document.getElementById('toggle-shipments');
     const shipmentPanel = document.getElementById('shipment-panel');
     let isExpanded = false;
@@ -335,6 +514,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 shipmentPanel.style.maxHeight = '';
             }
         });
+    }
+});
+
+// Reinicializar el mapa cuando se redimensiona la ventana
+window.addEventListener('resize', () => {
+    if (mapMisEnvios) {
+        mapMisEnvios.invalidateSize();
     }
 });
 </script>
