@@ -8,17 +8,18 @@ use Illuminate\Support\Facades\Auth;
 
 class Dashboard extends Component
 {
-    #[Computed]
     public $empresaCoordenadas = [
-            'lat' => 13.439624,
-            'lng' => -88.157400
-        ];
-        
+        'lat' => 13.439624,
+        'lng' => -88.157400
+    ];
+
+    public $enviosAnteriores = [];
+    public $primeraVez = true; // Flag para saber si es la primera carga
+    
     // Método para stats de HOY
     #[Computed]
     public function statsHoy()
     {
-        
         $repartidor = Auth::user();
         $hoy = now()->startOfDay();
 
@@ -118,7 +119,6 @@ class Dashboard extends Component
 
     public function seleccionarDia($fecha)
     {
-        // Buscar evento para ese día
         $repartidor = Auth::user();
         $fechaCarbon = \Carbon\Carbon::parse($fecha);
         
@@ -129,7 +129,6 @@ class Dashboard extends Component
             })
             ->first();
             
-        // Buscar vehículo asignado para ese día
         $vehiculoAsignacion = $repartidor->vehiculoAsignaciones()
             ->where('estado', 'activo')
             ->where('fecha_inicio', '<=', $fechaCarbon->endOfDay())
@@ -153,20 +152,14 @@ class Dashboard extends Component
         $this->diaSeleccionado = null;
     }
 
-
-    // LOGICA MAPA
-
-    public $notificaciones = 0;
-    public $ultimaNotificacion = null;
-
-    // Obtener envíos con coordenadas para el mapa
+    // LOGICA MAPA - Obtener envíos con coordenadas para el mapa
     #[Computed]
     public function enviosEnMapa()
     {
         $repartidor = Auth::user();
         $hoy = now()->startOfDay();
         
-        return $repartidor->envios()
+        $envios = $repartidor->envios()
             ->whereIn('estado', ['pendiente', 'en_ruta'])
             ->whereDate('created_at', $hoy)
             ->get()
@@ -179,58 +172,65 @@ class Dashboard extends Component
                     'destinatario' => $envio->destinatario_nombre,
                     'direccion' => $envio->destinatario_direccion,
                     'telefono' => $envio->destinatario_telefono,
+                    'codigo' => $envio->codigo,
                 ];
             })
             ->filter(function($envio) {
-                // Solo incluir envíos con coordenadas válidas
                 return !is_null($envio['lat']) && !is_null($envio['lng']);
             })
             ->values()
             ->toArray();
+
+        // Detectar cambios y disparar evento
+        $this->detectarCambiosEnvios($envios);
+
+        return $envios;
     }
 
-    // Escuchar cuando se asigna un nuevo envío
-    #[On('echo-private:repartidor.{userId},envio.actualizado')]
-    public function onEnvioActualizado($event)
+    // Detectar nuevos envíos o cambios de estado
+    private function detectarCambiosEnvios($enviosActuales)
     {
-        // Obtener el envío actualizado
-        $envio = \App\Models\Envio::find($event['envio_id']);
-        
-        if ($envio && $envio->lat && $envio->lng) {
-            // Enviar evento al frontend para actualizar el mapa
-            $this->dispatch('actualizar-marcador-mapa', [
-                'id' => $envio->id,
-                'lat' => $envio->lat,
-                'lng' => $envio->lng,
-                'estado' => $envio->estado,
-                'destinatario' => $envio->destinatario_nombre,
-                'direccion' => $envio->destinatario_direccion,
-                'telefono' => $envio->destinatario_telefono,
-                'accion' => $event['tipo'] // 'nuevo', 'actualizado', 'estado_cambiado'
-            ]);
+        // Si es la primera vez, no disparar eventos, solo guardar el estado inicial
+        if ($this->primeraVez) {
+            $this->enviosAnteriores = $enviosActuales;
+            $this->primeraVez = false;
+            return;
         }
-        
-        // Refrescar stats
-        unset($this->statsHoy);
-        unset($this->actividadReciente);
-        unset($this->enviosEnMapa);
-        
-        $this->notificaciones++;
-        $this->ultimaNotificacion = $event;
+
+        $idsActuales = collect($enviosActuales)->pluck('id')->toArray();
+        $idsAnteriores = collect($this->enviosAnteriores)->pluck('id')->toArray();
+
+        // Detectar nuevos envíos
+        $nuevosIds = array_diff($idsActuales, $idsAnteriores);
+        foreach ($nuevosIds as $nuevoId) {
+            $envio = collect($enviosActuales)->firstWhere('id', $nuevoId);
+            if ($envio) {
+                $this->dispatch('nuevo-envio-mapa', $envio);
+            }
+        }
+
+        // Detectar envíos eliminados (entregados, cancelados, etc)
+        $eliminadosIds = array_diff($idsAnteriores, $idsActuales);
+        foreach ($eliminadosIds as $eliminadoId) {
+            $this->dispatch('eliminar-envio-mapa', ['id' => $eliminadoId]);
+        }
+
+        // Detectar cambios de estado
+        foreach ($enviosActuales as $envioActual) {
+            $envioAnterior = collect($this->enviosAnteriores)->firstWhere('id', $envioActual['id']);
+            if ($envioAnterior && $envioAnterior['estado'] !== $envioActual['estado']) {
+                $this->dispatch('actualizar-estado-envio-mapa', $envioActual);
+            }
+        }
+
+        // Actualizar el array de envíos anteriores
+        $this->enviosAnteriores = $enviosActuales;
     }
 
-    // Método para cuando se elimina o cancela un envío
-    public function eliminarMarcador($envioId)
+    public function mount()
     {
-        $this->dispatch('eliminar-marcador-mapa', ['id' => $envioId]);
-    }
-
-    public function getListeners()
-    {
-        $userId = Auth::id();
-        return [
-            "echo-private:repartidor.{$userId},envio.actualizado" => 'onEnvioActualizado',
-        ];
+        // Inicializar con los envíos actuales
+        $this->enviosAnteriores = $this->enviosEnMapa;
     }
 
     public function render()
