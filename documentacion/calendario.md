@@ -24,6 +24,14 @@ El calendario se renderiza como una cuadrícula de 7 columnas (días de la seman
 @endphp
 ```
 
+-   **Uso de Carbon**:
+    -   `Carbon` es una librería de PHP que extiende la clase `DateTime` para facilitar la manipulación de fechas y horas.
+    -   En este contexto, se utiliza para:
+        -   Obtener el inicio y fin de un mes (`startOfMonth()`, `endOfMonth()`).
+        -   Ajustar fechas al inicio o fin de una semana específica (`startOfWeek()`, `endOfWeek()`), especificando el día de inicio de semana (ej., `Carbon::SUNDAY`).
+        -   Crear copias inmutables de objetos `Carbon` (`copy()`) para evitar modificar el original.
+
+
 -   **Visualización de Eventos**:
     -   Dentro del bucle de días, se filtran las disponibilidades (`$disponibilidades`) que caen dentro del día actual.
     -   Se muestran hasta 3 eventos como "píldoras" (`event-pill`). Si hay más, se muestra un indicador "+X más".
