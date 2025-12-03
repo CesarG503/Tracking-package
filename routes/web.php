@@ -50,5 +50,9 @@ Route::middleware(['auth', 'repartidor'])->group(function () {
         return view('repartidor.mis-envios');
     })->name('mis-envios');
 
+    Route::get('/mi-perfil', function() {
+        return view('repartidor.mi-perfil');
+    })->name('mi-perfil');
+
 });
 
