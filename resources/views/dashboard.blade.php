@@ -263,30 +263,36 @@ document.addEventListener('DOMContentLoaded', () => {
         el.classList.toggle('hidden');
     };
 
-    document.querySelectorAll('.envio-card').forEach(card => {
-        const target = card.getAttribute('data-target');
-        card.addEventListener('click', (e) => {
-            const isToggleButton = e.target.closest('.toggle-details');
-            if (isToggleButton) return; // lo manejará el botón
+    // Usar delegación de eventos para soportar contenido dinámico de Livewire
+    document.addEventListener('click', (e) => {
+        // Manejar clicks en envio-card
+        const envioCard = e.target.closest('.envio-card');
+        if (envioCard && !e.target.closest('.toggle-details')) {
+            const target = envioCard.getAttribute('data-target');
             if (target) toggle(target);
-        });
-    });
+            return;
+        }
 
-    document.querySelectorAll('.toggle-details').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        // Manejar clicks en toggle-details (Ver Ruta)
+        const toggleBtn = e.target.closest('.toggle-details');
+        if (toggleBtn) {
             e.stopPropagation();
             // Cargar ruta en el mapa
-            const lat = parseFloat(e.currentTarget.getAttribute('data-lat'));
-            const lng = parseFloat(e.currentTarget.getAttribute('data-lng'));
-            const nombre = e.currentTarget.getAttribute('data-nombre');
-            const direccion = e.currentTarget.getAttribute('data-direccion');
+            const lat = parseFloat(toggleBtn.getAttribute('data-lat'));
+            const lng = parseFloat(toggleBtn.getAttribute('data-lng'));
+            const nombre = toggleBtn.getAttribute('data-nombre');
+            const direccion = toggleBtn.getAttribute('data-direccion');
+            
+            console.log('Ver Ruta clicked - Coords:', lat, lng, '| Nombre:', nombre);
+            
             if (!isNaN(lat) && !isNaN(lng)) {
                 updateRoute(lat, lng, nombre, direccion);
             } else {
                 console.warn('Coordenadas inválidas del envío seleccionado', lat, lng);
             }
-        });
+        }
     });
+
 
     // Filtrado por tabs (en_ruta vs pendiente vs entregados)
     const tabEnRutas = document.getElementById('tab-en-rutas');
