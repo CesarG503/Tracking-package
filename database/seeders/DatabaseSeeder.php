@@ -109,19 +109,28 @@ class DatabaseSeeder extends Seeder
         Disponibilidad::create([
             "vehiculo_id" => $vehiculo1->id,
             "repartidor_id" => $repartidor1->id,
-            "fecha_inicio" => now(),
-            "fecha_fin" => now()->addHours(5),
+            "fecha_inicio" => now()->setTime(8, 0),
+            "fecha_fin" => now()->setTime(18, 0),
             "tipo" => "disponible",
-            "descripcion" => "Disponibilidad para entregas matutinas",
+            "descripcion" => "Jornada laboral completa",
         ]);
 
         Disponibilidad::create([
             "vehiculo_id" => $vehiculo2->id,
             "repartidor_id" => $repartidor2->id,
-            "fecha_inicio" => now(),
-            "fecha_fin" => now()->addHours(3),
+            "fecha_inicio" => now()->setTime(8, 0),
+            "fecha_fin" => now()->setTime(18, 0),
             "tipo" => "disponible",
-            "descripcion" => "Disponibilidad para entregas matutinas",
+            "descripcion" => "Jornada laboral completa",
+        ]);
+
+        Disponibilidad::create([
+            "vehiculo_id" => $vehiculo2->id, // Asumiendo que comparte o usa otro, pero por ahora uso vehiculo2 o null si no es obligatorio
+            "repartidor_id" => $repartidor3->id,
+            "fecha_inicio" => now()->setTime(8, 0),
+            "fecha_fin" => now()->setTime(18, 0),
+            "tipo" => "disponible",
+            "descripcion" => "Jornada laboral completa",
         ]);
 
         // Create Shipments

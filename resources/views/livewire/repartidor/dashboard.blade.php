@@ -211,11 +211,11 @@
                             <svg class="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                             </svg>
-                            Mis Vehículos
+                            Mis Vehículos (Esta Semana)
                         </h2>
 
                         <div class="flex flex-col gap-6">
-                            @forelse($this->vehiculosHoy as $item)
+                            @forelse($this->vehiculosSemana as $item)
                                 @if(isset($item->vehiculo))
                                     <div class="flex flex-col gap-3">
                                         <div class="glass glass-subtle rounded-xl p-4">
@@ -245,9 +245,7 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <a href="#" class="block text-center glass glass-subtle px-4 py-2 rounded-xl text-sm font-medium hover:shadow-md transition-all">
-                                            Ver detalles
-                                        </a>
+
                                     </div>
                                 @endif
                             @empty
@@ -257,7 +255,7 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
                                         </svg>
                                     </div>
-                                    <p class="text-foreground-muted mb-3">Sin vehículo asignado</p>
+                                    <p class="text-foreground-muted mb-3">Sin vehículo asignado esta semana</p>
                                 </div>
                             @endforelse
                         </div>
@@ -303,23 +301,33 @@
                                 @php
                                     $esHoy = $dia['es_hoy'];
                                     $tipo = $dia['tipo'];
-                                    $estilo = $estilos[$tipo] ?? $estilos['disponible'];
+                                    $estilo = $tipo ? ($estilos[$tipo] ?? $estilos['disponible']) : null;
                                 @endphp
                                 
                                 <div wire:click="seleccionarDia('{{ $dia['fecha'] }}')" 
-                                    class="flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-surface transition-colors {{ $esHoy ? 'glass glass-blue' : 'glass glass-subtle' }}" 
+                                    class="flex items-center justify-between p-2 rounded-lg cursor-pointer hover:bg-surface transition-colors {{ $esHoy ? 'glass glass-blue ring-1 ring-primary' : 'glass glass-subtle' }}" 
                                     title="{{ $dia['descripcion'] }}">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-sm font-medium {{ $esHoy ? 'text-primary' : 'text-foreground' }}">
-                                            {{ $dia['dia_nombre'] }}
-                                        </span>
-                                        <span class="text-xs text-foreground-muted">
-                                            {{ $dia['dia_numero'] }}
-                                        </span>
+                                    <div class="flex items-center gap-3">
+                                        <div class="flex flex-col items-center min-w-[3rem]">
+                                            <span class="text-sm font-medium {{ $esHoy ? 'text-primary' : 'text-foreground' }}">
+                                                {{ $dia['dia_nombre'] }}
+                                            </span>
+                                            <span class="text-xs text-foreground-muted">
+                                                {{ $dia['dia_numero'] }}
+                                            </span>
+                                        </div>
+                                        @if($dia['horario'])
+                                            <span class="text-xs text-foreground-muted bg-surface-secondary/50 px-2 py-1 rounded">
+                                                {{ $dia['horario'] }}
+                                            </span>
+                                        @endif
                                     </div>
-                                    <span class="glass {{ $estilo['badge'] }} glass-subtle px-2 py-0.5 rounded text-xs font-semibold">
-                                        {{ $estilo['texto'] }}
-                                    </span>
+                                    
+                                    @if($estilo)
+                                        <span class="glass {{ $estilo['badge'] }} glass-subtle px-2 py-0.5 rounded text-xs font-semibold">
+                                            {{ $estilo['texto'] }}
+                                        </span>
+                                    @endif
                                 </div>
                             @empty
                                 <div class="text-center py-4">
