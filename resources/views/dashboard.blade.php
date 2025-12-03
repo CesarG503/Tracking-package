@@ -69,8 +69,7 @@ const mapLayers = {
 
     },
     dark: {
-        url: 'https://tiles.stadiamaps.com/tiles/stamen_toner_dark/{z}/{x}/{y}{r}.png',
-
+        url: 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png',
     }
 };
 
