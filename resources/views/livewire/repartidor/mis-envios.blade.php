@@ -168,23 +168,7 @@
                 </div>
             @endif
 
-            {{-- Footer con Stats --}}
-            <div class="p-4 border-t border-foreground/10 glass-medium">
-                <div class="grid grid-cols-3 gap-3 text-center">
-                    <div>
-                        <p class="text-xs text-foreground-muted">Pendientes</p>
-                        <p class="text-lg font-bold text-warning">{{ $this->estadisticas()['pendientes'] }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-foreground-muted">En Ruta</p>
-                        <p class="text-lg font-bold text-primary">{{ $this->estadisticas()['en_ruta'] }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-foreground-muted">Entregados</p>
-                        <p class="text-lg font-bold text-success">{{ $this->estadisticas()['entregados'] }}</p>
-                    </div>
-                </div>
-            </div>
+
         </div>
 
         {{-- Panel Derecho - Mapa --}}
