@@ -342,9 +342,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const shipmentPanel = document.getElementById('shipment-panel');
     let isExpanded = false;
     
-    if (toggleBtn && shipmentPanel && window.innerWidth < 1024) {
+    // Siempre agregar el event listener, solo verificar el ancho al hacer click
+    if (toggleBtn && shipmentPanel) {
         toggleBtn.addEventListener('click', () => {
-            if (window.innerWidth >= 1024) return; // Solo en móvil
+            if (window.innerWidth >= 1024) return; // Solo ejecutar en móvil
             
             isExpanded = !isExpanded;
             
