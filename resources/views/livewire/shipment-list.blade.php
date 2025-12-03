@@ -1,4 +1,4 @@
-<div wire:poll.5s="loadShipments">
+<div wire:poll.5s="loadShipments" class="flex-1 flex flex-col overflow-hidden">
     <!-- Tabs -->
     <div class="px-4 lg:px-6 pb-3 border-b border-border dark:border-border transition-colors duration-300">
         <div class="flex gap-2">
@@ -21,7 +21,7 @@
     </div>
 
     <!-- Package List -->
-    <div class="flex-1 overflow-y-auto p-3 lg:p-4 space-y-3">
+    <div class="flex-1 min-h-0 !overflow-y-auto p-3 lg:p-4 space-y-3">
         <!-- Lista En Ruta -->
         <div class="space-y-3 {{ $activeTab !== 'en_ruta' ? 'hidden' : '' }}">
             @forelse($enviosEnRuta as $envio)
