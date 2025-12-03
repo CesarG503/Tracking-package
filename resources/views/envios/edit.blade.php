@@ -2,6 +2,17 @@
 
 @section('title', 'Editar Envío #' . $envio->codigo)
 
+@push('styles')
+<style>
+    .map-container {
+        height: 300px;
+        width: 100%;
+        border-radius: 0.75rem;
+        z-index: 1;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="flex h-screen overflow-hidden">
     {{-- Sidebar --}}
@@ -37,6 +48,10 @@
             <form action="{{ route('envios.update', $envio) }}" method="POST" enctype="multipart/form-data" class="space-y-6">
                 @csrf
                 @method('PUT')
+                
+                {{-- Hidden Inputs for Coordinates --}}
+                <input type="hidden" name="lat" id="lat" value="{{ old('lat', $envio->lat) }}">
+                <input type="hidden" name="lng" id="lng" value="{{ old('lng', $envio->lng) }}">
 
                 {{-- Información del Paquete --}}
                 <div class="bg-surface rounded-2xl p-6 shadow-sm border border-border">
@@ -157,13 +172,40 @@
 
                 {{-- Información del Destinatario --}}
                 <div class="bg-surface rounded-2xl p-6 shadow-sm border border-border">
-                    <h2 class="text-lg font-semibold text-foreground mb-4 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        Información del Destinatario
-                    </h2>
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-semibold text-foreground flex items-center gap-2">
+                            <svg class="w-5 h-5 text-success" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            Información del Destinatario
+                        </h2>
+                        <button type="button" id="toggle-location-map" class="text-xs px-3 py-1.5 bg-success border-border rounded-lg text-white hover:bg-success-hover transition-colors flex items-center gap-1">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            Mapa
+                        </button>
+                    </div>
+                    
+                    {{-- Mapa de ubicación (Oculto por defecto) --}}
+                    <div id="location-map-container" class="hidden mb-6 transition-all duration-300">
+                        <label class="block text-sm font-medium text-foreground mb-2">Seleccionar ubicación de entrega</label>
+                        <div id="map-location" class="map-container border border-border shadow-inner"></div>
+                        <div class="flex items-center justify-between mt-2">
+                            <p class="text-xs text-foreground-muted">Haga clic en el mapa para actualizar la ubicación de entrega.</p>
+                            <div class="text-xs text-foreground-muted">
+                                <span id="current-coords">
+                                    @if($envio->lat && $envio->lng)
+                                        {{ number_format($envio->lat, 6) }}, {{ number_format($envio->lng, 6) }}
+                                    @else
+                                        Sin coordenadas
+                                    @endif
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-medium text-foreground mb-2">Nombre Completo *</label>
@@ -379,6 +421,8 @@
 </div>
 
 @push('scripts')
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
 <script>
 // Preview de imagen
 document.getElementById('foto_paquete').addEventListener('change', function(e) {
@@ -504,6 +548,88 @@ async function cargarRecursosDisponibles() {
 // Event listeners para fecha y hora
 document.getElementById('fecha_estimada').addEventListener('change', cargarRecursosDisponibles);
 document.getElementById('hora_disponibilidad').addEventListener('change', cargarRecursosDisponibles);
+
+// --- MAP LOGIC ---
+let mapLocation = null;
+let markerLocation = null;
+const toggleLocationMapBtn = document.getElementById('toggle-location-map');
+const locationMapContainer = document.getElementById('location-map-container');
+
+// Default center: San Miguel, El Salvador
+const defaultLat = 13.4834;
+const defaultLng = -88.1833;
+
+// Current coordinates from database
+const currentLat = {{ $envio->lat ? $envio->lat : 'null' }};
+const currentLng = {{ $envio->lng ? $envio->lng : 'null' }};
+
+toggleLocationMapBtn.addEventListener('click', function() {
+    locationMapContainer.classList.toggle('hidden');
+    
+    if (!locationMapContainer.classList.contains('hidden')) {
+        if (!mapLocation) {
+            // Initialize map
+            const centerLat = currentLat || defaultLat;
+            const centerLng = currentLng || defaultLng;
+            
+            mapLocation = L.map('map-location').setView([centerLat, centerLng], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(mapLocation);
+
+            // Add existing marker if coordinates exist
+            if (currentLat && currentLng) {
+                markerLocation = L.marker([currentLat, currentLng]).addTo(mapLocation);
+            }
+
+            // Map click handler
+            mapLocation.on('click', async function(e) {
+                const lat = e.latlng.lat;
+                const lng = e.latlng.lng;
+
+                // Update hidden inputs
+                document.getElementById('lat').value = lat;
+                document.getElementById('lng').value = lng;
+
+                // Update coordinates display
+                document.getElementById('current-coords').textContent = 
+                    `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+
+                // Update or create marker
+                if (markerLocation) {
+                    markerLocation.setLatLng(e.latlng);
+                } else {
+                    markerLocation = L.marker(e.latlng).addTo(mapLocation);
+                }
+
+                // Update address field
+                const addressField = document.querySelector('textarea[name="destinatario_direccion"]');
+                if (addressField) {
+                    const originalValue = addressField.value;
+                    addressField.value = "Actualizando dirección...";
+                    addressField.classList.add('opacity-50');
+
+                    try {
+                        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+                        const data = await response.json();
+                        if (data && data.display_name) {
+                            addressField.value = data.display_name;
+                        } else {
+                            addressField.value = originalValue; // Keep original if can't geocode
+                        }
+                    } catch (error) {
+                        console.error('Error fetching address:', error);
+                        addressField.value = originalValue; // Keep original on error
+                    } finally {
+                        addressField.classList.remove('opacity-50');
+                    }
+                }
+            });
+        } else {
+            setTimeout(() => mapLocation.invalidateSize(), 200);
+        }
+    }
+});
 
 // Trigger initial load
 document.addEventListener('DOMContentLoaded', function() {
