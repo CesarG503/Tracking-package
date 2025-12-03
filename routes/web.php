@@ -49,6 +49,10 @@ Route::middleware(['auth', 'repartidor'])->group(function () {
     Route::get('/mis-envios', function() {
         return view('repartidor.mis-envios');
     })->name('mis-envios');
+    
+    Route::get('/calendario', function() {
+        return view('repartidor.calendario');
+    })->name('repartidor.calendario');
 
 });
 
