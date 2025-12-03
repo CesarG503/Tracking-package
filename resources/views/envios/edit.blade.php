@@ -252,7 +252,7 @@
                         </div>
                     </div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="asignacionRepartidor">
                         <div>
                             <label class="block text-sm font-medium text-foreground mb-2">Fecha Estimada de Entrega *</label>
                             <input type="date" 
